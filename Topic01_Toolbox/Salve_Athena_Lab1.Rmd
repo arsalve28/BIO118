@@ -1,0 +1,106 @@
+---
+title: "Salve_Athena_Lab1"
+author: "Athena Salve"
+date: "2026-08-30"
+output: html_document
+---
+
+# R Markdown and Organizing Project Files
+
+## Introduction
+
+R Markdown is a tool that combines text, code, and output in a single document. It allows you to create dynamic reports, presentations, and other documents that include both code and the results of that code. This exercise will introduce you to the basics of R Markdown and how to organize your Project files. Follow the activities below and complete all required tasks and guide questions.
+
+## Answers to Guide Questions and Reflection
+
+1.  What is the output of 2 + 2?
+
+    The command `2 + 2` will add the two values, which results in **4**.
+
+2.  What is the output of sum(1:4)?
+
+    The command `sum(1:4)` adds the values from 1 to 4, which results in **10**.
+
+3.  What appears in the Environment pane after creating fish_lengths?
+
+    The Environment pane shows `fish_lengths` as `num [1:4] 20 17 22 23`, a **numeric vector containing four values: 20, 17, 22, and 23**.
+
+4.  What does the command plot(fish_lengths) produce?
+
+    The `plot(fish_lengths)` command produces a **scatter plot showing the fish lengths at each index from 1 to 4, with the lengths 20, 17, 22, and 23 respectively**. The **x-axis represents the index**, while the **y-axis represents the fish lengths**.
+
+5.  Why is it preferable to keep commands in an R script rather than entering all commands directly into the Console?
+
+    It is preferable to keep commands in R script because **the commands can be saved, organized, easily edited, and can be rerun later in RStudio**. These makes the work **easier to reproduce and reducing the chance of losing the commands** compared to entering them only in the console.
+
+6.  What is the output of 2 + 5?
+
+    The command `2 + 5` adds the two values, which results in **7**.
+
+7.  What happens in the Environment pane after running a \<- 1 + 2?
+
+    The Environment pane shows **`a` as a numeric variable with the value 3**.
+
+8.  What is printed in the Console when you run a?
+
+    The console prints **3**.
+
+9.  What is the advantage of editing and saving commands in an R script?
+
+    The advantage of editing and saving commands in an R script is that **commands can be keep in one place and easily changed, edited, and rerun when needed**.
+
+10. How many observations are in the BOD dataset?
+
+    There are **6 observations** in `BOD`, as shown by **"6 obs. of 2 variables,"** in the Environment pane.
+
+11. How many variables are in the dataset?
+
+    There are **2 variables** in `BOD`.
+
+12. What are the names of the two variables?
+
+    The names of two variables are **Time** and **demand**.
+
+13. What are the units of Time and demand?
+
+    After running `?BOD`, the Help tab shows that **Time is measured in days**, while **demand is measured in mg/l (milligrams per liter)**.
+
+14. What type of graph is produced by plot(BOD)?
+
+    The graph produced is a **scatter plot**. It shows the relationship between Time on the x-axis and demand on the y-axis.
+
+15. Why is this type of graph appropriate for examining the relationship between the variables?
+
+    A scatter plot is appropriate because it allows us to **easily see the relationship or pattern between two numerical variables**, like Time and demand. It shows **the trend of how biochemical oxygen demand changes as time increases**, which can help evaluate water quality.
+
+## Exploring a Built-in Biological Dataset
+
+##### R contains several built-in datasets that can be used for learning and demonstration.
+
+- Load the BOD dataset
+
+```{r}
+data(BOD)
+```
+
+- Display the BOD dataset
+
+```{r}
+BOD
+```
+
+- Examine the structure of BOD
+
+```{r}
+str(BOD)
+```
+
+- Create a plot of BOD
+
+```{r}
+plot(BOD)
+```
+
+## Conclusion
+
+In this exercise, I learned the basics of using R and RStudio, including how to install R and RStudio, create projects, and navigate the Console, R Script, Environment, Files, Plots, and Help panes. I also learned the importance of using R Scripts to organize and save commands for future use. Moreover, I learned how to create and format an R Markdown document using both Source and Visual modes, add and run R code chunks, and work with datasets in R. Through exploring the `BOD` dataset, I was able to apply these skills by viewing the data, examining its structure, and creating a plot to visualize the relationship between its variables.
