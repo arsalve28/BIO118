@@ -73,6 +73,10 @@ R Markdown is a tool that combines text, code, and output in a single document. 
 
     A scatter plot is appropriate because it allows us to **easily see the relationship or pattern between two numerical variables**, like Time and demand. It shows **the trend of how biochemical oxygen demand changes as time increases**, which can help evaluate water quality.
 
+16. How can R, RStudio, R Markdown, Git, and GitHub support reproducible biological research?
+
+    **R is the programming language** used to analyze biological data in **RStudio**, which provides **an organized environment for writing and running code**, while **R Markdown** is used to **document the analysis and create reports.** **Git** provides **version control**, while **GitHub** allows researchers to **share and collaborate on their work**. Together, these tools **make biological research more organized, transparent, and reproducible**.
+
 ## Exploring a Built-in Biological Dataset
 
 ##### R contains several built-in datasets that can be used for learning and demonstration.
