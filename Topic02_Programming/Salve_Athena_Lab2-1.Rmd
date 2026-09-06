@@ -1,0 +1,177 @@
+---
+title: "Salve_Athena_Lab2-1"
+author: "Athena Salve"
+date: "2026-09-06"
+output: html_document
+---
+
+### Student Information
+
+Name: Athena Nicole R. Salve
+
+Section: B2
+
+Date: September 2, 2026
+
+GitHub Repository URL: <https://github.com/arsalve28/BIO118>
+
+# 2A Data Types and Operators
+
+## Introduction
+
+R stores information in different data types, which determine how values are represented and how R can operate on them. Common data types used in biological data analysis include character, numeric, integer, and logical values. Operators in R allow us to perform calculations, compare observations, and construct logical conditions. These operations form the foundation for later programming tasks such as subsetting data, using conditional statements, and automating analyses. In this laboratory exercise, you will work with biological and environmental examples to practice creating and manipulating data types and using operators in R.
+
+### Practice
+
+#### 2.3.1 Monitoring Species Population in Different Habitats
+
+```{r}
+habitat_A_population <- 320
+habitat_B_population <- 275
+total_population <- habitat_A_population + habitat_B_population
+is_habitat_A_larger <- habitat_A_population > habitat_B_population
+population_difference <- habitat_A_population - habitat_B_population
+print(paste("Habitat A Population:", habitat_A_population))
+print(paste("Habitat B Population:", habitat_B_population))
+print(paste("Total Population:", total_population))
+print(paste("Is Habitat A larger than habitat B?", is_habitat_A_larger))
+print(paste("Population Difference:", population_difference))
+```
+
+#### 2.3.2 Analyzing Environmental Data for Climate Change Impact
+
+```{r}
+current_temperature <- 25
+predicted_increase <- 3.8
+future_temperature <- current_temperature + predicted_increase
+current_temp_fahrenheit <- (current_temperature * 9/5) + 32
+future_temp_fahrenheit <- (future_temperature * 9/5) + 32
+exceeds_threshold <- future_temperature > 5
+print(paste("Current Temperature:", current_temperature, "°C"))
+print(paste("Predicted Increase:", predicted_increase, "°C"))
+print(paste("Future Temperature:", future_temperature, "°C"))
+print(paste("Current Temperature in Fahrenheit:", 
+            current_temp_fahrenheit, "°F"))
+print(paste("Future Temperature in Fahrenheit:", 
+            future_temp_fahrenheit, "°F"))
+print(paste("Does the future temperature exceeds threshold?", 
+            exceeds_threshold))
+```
+
+#### 2.3.3 Evaluating Pollutant Levels in a River
+
+```{r}
+chemical_X_concentration <- 15.3
+chemical_Y_concentration <- 9.8
+is_chemical_X_safe <- chemical_X_concentration < 10
+is_chemical_Y_safe <- chemical_Y_concentration < 10
+are_both_safe <- is_chemical_X_safe & is_chemical_Y_safe
+print(paste("Chemical X Concentration:", 
+            chemical_X_concentration, "ppm"))
+print(paste("Chemical Y Concentration:", 
+            chemical_Y_concentration, "ppm"))
+print(paste("Is Chemical X Safe?", is_chemical_X_safe))
+print(paste("Is Chemical Y Safe?", is_chemical_Y_safe))
+print(paste("Are Both Chemicals Safe?", are_both_safe))
+```
+
+# 2B Understanding Data Structures
+
+## Introduction
+
+Biological datasets can contain different types of information, including species names, measurements, sampling locations, environmental conditions, and categorical observations. R provides different data structures for organizing these values. The most commonly encountered structures in biological data analysis include:
+
+- vectors- one-dimensional collections of values of the same data type;
+
+- matrices- two-dimensional structures consisting of rows and columns, in which all elements have the same basic data type;
+
+- data frames- two-dimensional tabular structures in which different columns can contain different data types;
+
+- lists- collections that can contain different types and structures of objects;
+
+- factors- structures designed to represent categorical variables.
+
+Choosing an appropriate data structure is important because it determines how data can be stored, accessed, and manipulated.
+
+### Practice
+
+#### 2.2.1 Working with DNA Sequences
+
+```{r}
+#install stringr package
+library(stringr)
+
+#Character Vector Named dna-sequences
+dna_sequences <- c("ATGCGTACGTAGCTAGCGT", 
+                   "ATGCGTACGTAGTTAGCGT", 
+                   "ATGCGTACGTAGATAGCGT")
+
+#Length of Each DNA Sequence
+print("Length of each DNA sequence:")
+nchar(dna_sequences)
+
+#Number of Occurrences of the Nucleotide "A" in Each Sequence
+print("Number of occurrences of nucleotide A in each sequence:")
+str_count(dna_sequences, "A")
+```
+
+#### 2.2.2 Monitoring Species Population in Different Habitats
+
+```{r}
+#Create Data Frame named biodiversity_data
+biodiversity_data <- data.frame(
+  Species = c("Oak", "Pine", "Maple", "Birch","Spruce", "Cedar",
+              "Ash", "Fir", "Beech"),
+  Count = c(120, 85, 100, 60, 150, 75, 55, 95, 110),
+  Habitat = c("Forest A", "Forest A", "Forest A", 
+              "Forest B", "Forest B", "Forest B", 
+              "Forest C", "Forest C", "Forest C")
+  )
+
+#Total Number of Individuals Observed in Each Habitat
+print("Total number of individuals observed in each habitat:")
+tapply(biodiversity_data$Count, biodiversity_data$Habitat, sum)
+
+#Subset Data Frame to Find All Species with a Count Less than 60
+low_count_species <- subset(biodiversity_data, Count < 60)
+print("Species with count less than 60:")
+print(low_count_species)
+```
+
+#### Monitoring Temperature Changes
+
+```{r}
+#Matrix Named monthly_temps 
+monthly_temps <- matrix(
+  c(
+    2.5, 3.1, 6.2, 10.5, 15.3, 20.1,
+    22.4, 21.9, 18.3, 13.8, 7.5, 3.9,
+    2.7, 3.5, 6.8, 11.0, 16.0, 21.0,
+    23.1, 22.5, 19.0, 14.5, 8.0, 4.1
+  ),
+  nrow = 12,
+  ncol = 2,
+)
+
+rownames(monthly_temps) <- c("January", "February", "March", 
+                             "April", "May", "June", "July", 
+                             "August","September", "October", 
+                             "November", "December")
+colnames(monthly_temps) <- c("Year_1", "Year_2")
+
+# Calculate the average temperature for each year
+avg_temp_per_year <- colMeans(monthly_temps)
+print("Average temperature for each year:")
+print(avg_temp_per_year)
+
+is_year_2_higher <- avg_temp_per_year["Year_2"] > 
+  avg_temp_per_year["Year_1"]
+print(paste("Did Year 2 have a higher average temperature?", 
+            is_year_2_higher)
+      )
+
+# Subset to retrieve temperatures for the summer months
+temps_for_summer_months <- monthly_temps[c("June", "July", "August"), ]
+print("Temperatures for the summer months:")
+print(temps_for_summer_months)
+```
