@@ -63,9 +63,10 @@ i <- 1
 
 #Use while loop until expression level drops below 15
 while (tissue_2 [i, 2] >= 15) {
-  print(tissue_2 [i, ])
   i <- i + 1
 }
+
+print(tissue_2[1:i, ])
 ```
 
 #### 2.4.2 Monitoring Species Populations
@@ -110,7 +111,7 @@ for (i in 1:11) {
   }
   
   if (pollution_levels[i] > 50) {
-    print(paste("Warning:", pollution_levels[i], "ppm"))
+    print(paste("Warning: Pollution level is", pollution_levels[i], "ppm"))
   }
 }
 
@@ -121,7 +122,7 @@ repeat {
   print(paste("Current pollution level:", pollution_levels[i], "ppm"))
   
   if (pollution_levels[i] >= 90) {
-    print(paste("Critical warning:", pollution_levels[i], "ppm"))
+    print(paste("Critical warning: Pollution level has reached", pollution_levels[i], "ppm"))
     break
   }
   
@@ -146,7 +147,7 @@ transcribe_dna_to_rna <- function(dna_sequence) {
 }
 
 #Test the function
-dna_sequence <- "ATGCGTAGCTAGCTAGCGT"
+dna_sequence <- "ATGCGTACGTAGCTAGCGT"
 transcribe_dna_to_rna(dna_sequence)
 ```
 

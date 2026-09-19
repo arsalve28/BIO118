@@ -159,7 +159,6 @@ for (i in 1:10) {
 
 #2.4.1 Analyzing Gene Expression Data
 
-#create data frame named gene_expression
 gene_expression <- data.frame(
   Gene = c("GeneA", "GeneB", "GeneC", "GeneD", "GeneE",
            "GeneA", "GeneB", "GeneC", "GeneD", "GeneE",
@@ -174,10 +173,10 @@ gene_expression <- data.frame(
              "Tissue3", "Tissue3", "Tissue3", "Tissue3", "Tissue3")
 )
 
-#view data frame
+#View data frame
 gene_expression
 
-#for loop and if statement to identify genes with an expression_level above 20
+#For loop and If statement to identify genes with an expression_level above 20
 for (i in 1:15) {
   if (gene_expression [i, 2] > 20) {
     print (paste(gene_expression [i, 1],
@@ -185,19 +184,19 @@ for (i in 1:15) {
   }
 }
 
-#while loop to find the first gene with expression level below 15
+#While loop to find the first gene with expression level below 15
 
-#select tissue 2
+#Select tissue 2
 tissue_2 <- gene_expression [6:10,]
 
-#start with the first gene
+#Start with the first gene
 i <- 1
 
-#use while loop until expression level drops below 15
+#Use while loop until expression level drops below 15
 while (tissue_2 [i, 2] >= 15) {
-  print(tissue_2 [i, ])
   i <- i + 1
 }
+print(tissue_2[1:i, ])
 
 
 #2.4.2 Monitoring Species Populations
@@ -239,7 +238,7 @@ for (i in 1:11) {
   }
   
   if (pollution_levels[i] > 50) {
-    print(paste("Warning:", pollution_levels[i], "ppm"))
+    print(paste("Warning: Pollution level is", pollution_levels[i], "ppm"))
   }
 }
 
@@ -250,7 +249,7 @@ repeat {
   print(paste("Current pollution level:", pollution_levels[i], "ppm"))
   
   if (pollution_levels[i] >= 90) {
-    print(paste("Critical warning:", pollution_levels[i], "ppm"))
+    print(paste("Critical warning: Pollution level has reached", pollution_levels[i], "ppm"))
     break
   }
   
@@ -355,7 +354,7 @@ transcribe_dna_to_rna <- function(dna_sequence) {
 }
 
 # Test the function
-dna_sequence <- "ATGCGTAGCTAGCTAGCGT"
+dna_sequence <- "ATGCGTACGTAGCTAGCGT"
 transcribe_dna_to_rna(dna_sequence)
 
 

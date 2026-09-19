@@ -436,13 +436,14 @@ i &lt;- 1
 
 #Use while loop until expression level drops below 15
 while (tissue_2 [i, 2] &gt;= 15) {
-  print(tissue_2 [i, ])
   i &lt;- i + 1
-}</code></pre>
+}
+
+print(tissue_2[1:i, ])</code></pre>
 <pre><code>##    Gene Expression_Level  Tissue
 ## 6 GeneA             20.2 Tissue2
-##    Gene Expression_Level  Tissue
-## 7 GeneB             17.6 Tissue2</code></pre>
+## 7 GeneB             17.6 Tissue2
+## 8 GeneC             14.3 Tissue2</code></pre>
 </div>
 <div id="monitoring-species-populations" class="section level4">
 <h4>2.4.2 Monitoring Species Populations</h4>
@@ -502,14 +503,14 @@ for (i in 1:11) {
   }
   
   if (pollution_levels[i] &gt; 50) {
-    print(paste(&quot;Warning:&quot;, pollution_levels[i], &quot;ppm&quot;))
+    print(paste(&quot;Warning: Pollution level is&quot;, pollution_levels[i], &quot;ppm&quot;))
   }
 }</code></pre>
-<pre><code>## [1] &quot;Warning: 60 ppm&quot;
-## [1] &quot;Warning: 70 ppm&quot;
-## [1] &quot;Warning: 80 ppm&quot;
-## [1] &quot;Warning: 90 ppm&quot;
-## [1] &quot;Warning: 100 ppm&quot;</code></pre>
+<pre><code>## [1] &quot;Warning: Pollution level is 60 ppm&quot;
+## [1] &quot;Warning: Pollution level is 70 ppm&quot;
+## [1] &quot;Warning: Pollution level is 80 ppm&quot;
+## [1] &quot;Warning: Pollution level is 90 ppm&quot;
+## [1] &quot;Warning: Pollution level is 100 ppm&quot;</code></pre>
 <pre class="r"><code>#repeat loop to monitor pollution levels until critical level is detected
 i &lt;- 1
 
@@ -517,7 +518,7 @@ repeat {
   print(paste(&quot;Current pollution level:&quot;, pollution_levels[i], &quot;ppm&quot;))
   
   if (pollution_levels[i] &gt;= 90) {
-    print(paste(&quot;Critical warning:&quot;, pollution_levels[i], &quot;ppm&quot;))
+    print(paste(&quot;Critical warning: Pollution level has reached&quot;, pollution_levels[i], &quot;ppm&quot;))
     break
   }
   
@@ -533,7 +534,7 @@ repeat {
 ## [1] &quot;Current pollution level: 70 ppm&quot;
 ## [1] &quot;Current pollution level: 80 ppm&quot;
 ## [1] &quot;Current pollution level: 90 ppm&quot;
-## [1] &quot;Critical warning: 90 ppm&quot;</code></pre>
+## [1] &quot;Critical warning: Pollution level has reached 90 ppm&quot;</code></pre>
 </div>
 </div>
 </div>
@@ -562,9 +563,9 @@ transcribe_dna_to_rna &lt;- function(dna_sequence) {
 }
 
 #Test the function
-dna_sequence &lt;- &quot;ATGCGTAGCTAGCTAGCGT&quot;
+dna_sequence &lt;- &quot;ATGCGTACGTAGCTAGCGT&quot;
 transcribe_dna_to_rna(dna_sequence)</code></pre>
-<pre><code>## [1] &quot;AUGCGUAGCUAGCUAGCGU&quot;</code></pre>
+<pre><code>## [1] &quot;AUGCGUACGUAGCUAGCGU&quot;</code></pre>
 </div>
 <div id="predicting-future-population-size" class="section level4">
 <h4>2.2.2 Predicting Future Population Size</h4>
