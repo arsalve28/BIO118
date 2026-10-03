@@ -1,5 +1,5 @@
 ---
-title: "Lab_Athena_Lab3"
+title: "Salve_Athena_Lab3"
 output: html_document
 ---
 
@@ -9,7 +9,7 @@ Name: Athena Nicole R. Salve
 
 Section: B2
 
-Date: September 2, 2026
+Date: October 3, 2026
 
 GitHub Repository URL: <https://github.com/arsalve28/BIO118>
 
@@ -23,9 +23,9 @@ The tidyr package in R provides functions for organizing and reshaping data. A t
 
 In this exercise, you will practice using selected tidyr functions to reorganize and clean biological datasets. You will work with both small examples and a simulated gene-expression dataset to understand how these techniques can be applied to biological data.
 
-### Practice
+## Practice
 
-## Simulated Gene Expression Dataset
+### Simulated Gene Expression Dataset
 
 ```{r}
 # Load the package
@@ -72,9 +72,10 @@ tidy_gene_expression <- separate(
 
 # Examine the tidy dataset
 print(tidy_gene_expression)
+print(tidy_gene_expression, n = 32)
 ```
 
-- The missing expression value belongs to Gene2 under the treatment condition (treat), in liver tissue, for replicate 1 (rep1). I would retain this observation because the reason for the missing value is unknown. It can be handled later based on the requirements of the analysis.
+- The missing expression value belongs to Gene2 under the treatment condition, treat. Specifically, it is in liver tissue, for replicate 1 (rep1). I would retain this observation because the reason for the missing value is unknown, and it can be handled later based on the requirements of the analysis.
 
 ```{r}
 # Recreate the tidy dataset using a single piped workflow
@@ -96,6 +97,7 @@ tidy_gene_expression <- gene_expression %>%
   )
 
 print(tidy_gene_expression)
+print(tidy_gene_expression, n = 32)
 ```
 
 # 3B Transforming Data
@@ -104,17 +106,17 @@ print(tidy_gene_expression)
 
 Biological datasets often need to be transformed, summarized, and reorganized before they can be visualized or analyzed statistically. The dplyr package in R provides functions that make these tasks easier and more reproducible. These functions can be used to select variables, filter observations, create new variables, arrange data, summarize measurements, and combine information from different datasets. The tidyr package in R provides functions for organizing and reshaping data. A tidy dataset generally follows three principles: each variable is represented by a column, each observation is represented by a row, and each cell contains a single value.
 
-In this exercise, you will work with simulated biological datasets to practice common data-transformation tasks using dplyr. You will also learn how to combine multiple operations into a single workflow using the pipe operator (%>%). These skills will help you prepare biological data for visualization and, later in the course, for statistical analysis.
+In this exercise, you will work with simulated biological datasets to practice common data-transformation tasks using dplyr. You will also learn how to combine multiple operations into a single workflow using the pipe operator (%\>%). These skills will help you prepare biological data for visualization and, later in the course, for statistical analysis.
 
-### Practice
+## Practice
 
-## Simulated Abundance Dataset
+### Simulated Abundance Dataset
 
-```{r}
+```{r} 
 # Load the package
 library(dplyr)
 
-# Create the simulated dataset
+# Create the simulated abundance dataset
 set.seed(123)
 
 species_list <- c("Species_A", "Species_B", "Species_C", "Species_D")
@@ -176,7 +178,7 @@ species_summary <- abundance_data %>%
 
 print(species_summary)
 
-# Use a single pipeline to filter years after 2010, group by region, calculate means, and arrange the results
+# Use a pipeline operator to filter years after 2010, group by region, calculate means, and arrange the results
 processed_abundance_data <- abundance_data %>%
   filter(year > 2010) %>%
   group_by(region) %>%
@@ -193,13 +195,13 @@ print(processed_abundance_data)
 
 ## Introduction
 
-Biological datasets often contain information that needs to be cleaned, standardized, or converted into an appropriate format before analysis.  Species names, gene identifiers, experimental conditions, categorical variables, and dates and times may be recorded inconsistently or stored as text even when they represent structured information.
+Biological datasets often contain information that needs to be cleaned, standardized, or converted into an appropriate format before analysis. Species names, gene identifiers, experimental conditions, categorical variables, and dates and times may be recorded inconsistently or stored as text even when they represent structured information.
 
 In this exercise, you will use functions from the stringr, forcats, and lubridate packages to clean and transform biological data. You will practice manipulating character strings, organizing categorical variables, and converting and extracting information from dates and times. These skills are important when preparing biological datasets for visualization and statistical analysis.
 
-### Practice
+## Practice
 
-## Simulated Cell Biology Experiment Data
+### Simulated Cell Biology Experiment Data
 
 ```{r}
 # Load the packages
@@ -208,7 +210,7 @@ library(stringr)
 library(forcats)
 library(lubridate)
 
-# Create the simulated cell biology dataset
+# Create the simulated cell biology experiment dataset
 cell_data <- data.frame(
   cell_line = c("HEK293 ", "HeLa", "A549 ", "HepG2", "HeLa", "HEK293"),
   gene_expression = c(
@@ -300,7 +302,6 @@ cell_data <- cell_data %>%
 print(cell_data)
 ```
 
-
 # 3D Organizing Files within an R Project
 
 ## Introduction
@@ -346,5 +347,5 @@ plot(
   ylab = "Sepal Width (cm)",
   pch = 19
 )
-
 ```
+
