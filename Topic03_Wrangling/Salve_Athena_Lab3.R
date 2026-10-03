@@ -1,0 +1,285 @@
+# Practice 3A
+
+# Load the package
+library(tidyr)
+
+# Create the simulated gene expression dataset
+gene_expression <- data.frame(
+  gene_id = c("Gene1", "Gene2", "Gene3", "Gene4"),
+  ctrl_brain_rep1 = c(12, 18, 23, 9),
+  ctrl_brain_rep2 = c(11, 19, 24, 10),
+  treat_brain_rep1 = c(15, 21, 28, 11),
+  treat_brain_rep2 = c(14, 22, 30, 12),
+  ctrl_liver_rep1 = c(22, 30, 35, 20),
+  ctrl_liver_rep2 = c(21, 31, 36, 21),
+  treat_liver_rep1 = c(26, NA, 39, 25),
+  treat_liver_rep2 = c(27, 34, 40, 26)
+)
+
+print(gene_expression)
+
+# Convert the dataset from wide to long format
+long_gene_expression <- pivot_longer(
+  gene_expression,
+  cols = c(
+    ctrl_brain_rep1, ctrl_brain_rep2,
+    treat_brain_rep1, treat_brain_rep2,
+    ctrl_liver_rep1, ctrl_liver_rep2,
+    treat_liver_rep1, treat_liver_rep2
+  ),
+  names_to = "measurement",
+  values_to = "expression"
+)
+
+# Examine the long dataset
+print(long_gene_expression)
+
+# Split measurement into condition, tissue, and replicate
+tidy_gene_expression <- separate(
+  long_gene_expression,
+  measurement,
+  into = c("condition", "tissue", "replicate"),
+  sep = "_"
+)
+
+# Examine the tidy dataset
+print(tidy_gene_expression)
+print(tidy_gene_expression, n = 32)
+
+# Recreate the tidy dataset using a single piped workflow
+tidy_gene_expression <- gene_expression %>%
+  pivot_longer(
+    cols = c(
+      ctrl_brain_rep1, ctrl_brain_rep2,
+      treat_brain_rep1, treat_brain_rep2,
+      ctrl_liver_rep1, ctrl_liver_rep2,
+      treat_liver_rep1, treat_liver_rep2
+    ),
+    names_to = "measurement",
+    values_to = "expression"
+  ) %>%
+  separate(
+    measurement,
+    into = c("condition", "tissue", "replicate"),
+    sep = "_"
+  )
+
+print(tidy_gene_expression)
+print(tidy_gene_expression, n = 32)
+
+# Practice 3B
+
+# Load the package
+library(dplyr)
+
+# Create the simulated abundance dataset
+set.seed(123)
+
+species_list <- c("Species_A", "Species_B", "Species_C", "Species_D")
+region_list <- c("Region_1", "Region_2", "Region_3")
+
+years <- sample(2000:2020, 100, replace = TRUE)
+abundance <- sample(1:500, 100, replace = TRUE)
+temperature <- sample(15:35, 100, replace = TRUE)
+
+abundance_data <- data.frame(
+  species = sample(species_list, 100, replace = TRUE),
+  region = sample(region_list, 100, replace = TRUE),
+  year = years,
+  abundance = abundance,
+  temperature = temperature
+)
+
+print(abundance_data)
+
+# Filter observations with abundance greater than 100 and temperature above 20 degrees Celsius
+filtered_data <- filter(
+  abundance_data,
+  abundance > 100,
+  temperature > 20
+)
+
+print(filtered_data)
+
+# Select only species, region, and abundance
+selected_data <- select(
+  abundance_data,
+  species, region, abundance
+)
+
+print(selected_data)
+
+# Arrange species alphabetically, then abundance in descending order
+arranged_data <- arrange(
+  abundance_data,
+  species,
+  desc(abundance)
+)
+
+print(arranged_data)
+
+# Calculate overall total abundance and average temperature
+summary_data <- summarize(
+  abundance_data,
+  total_abundance = mean(abundance) * n(),
+  mean_temperature = mean(temperature)
+)
+
+print(summary_data)
+
+# Calculate mean abundance for each species
+species_summary <- abundance_data %>%
+  group_by(species) %>%
+  summarize(mean_abundance = mean(abundance))
+
+print(species_summary)
+
+# Use a pipeline operator to filter years after 2010, group by region, calculate means, and arrange the results
+processed_abundance_data <- abundance_data %>%
+  filter(year > 2010) %>%
+  group_by(region) %>%
+  summarize(
+    mean_abundance = mean(abundance),
+    mean_temperature = mean(temperature)
+  ) %>%
+  arrange(desc(mean_abundance))
+
+print(processed_abundance_data)
+
+# Practice 3C
+
+# Load the packages
+library(dplyr)
+library(stringr)
+library(forcats)
+library(lubridate)
+
+# Create the simulated cell biology experiment dataset
+cell_data <- data.frame(
+  cell_line = c("HEK293 ", "HeLa", "A549 ", "HepG2", "HeLa", "HEK293"),
+  gene_expression = c(
+    "BRCA1_001", "TP53_002", "MYC_003",
+    "EGFR_001", "BRCA2_004", "EGFR_005"
+  ),
+  treatment = c(
+    "Control", "control", "Treatment",
+    "TREATMENT", "Control", "control"
+  ),
+  observation_time = c(
+    "2023-07-15 08:30:00",
+    "2023-07-15 10:45:00",
+    "2023-07-16 09:00:00",
+    "2023-07-16 11:20:00",
+    "2023-07-17 12:15:00",
+    "2023-07-17 13:00:00"
+  )
+)
+
+print(cell_data)
+
+# Remove leading and trailing whitespace from cell_line
+cell_data <- cell_data %>%
+  mutate(cell_line = str_trim(cell_line))
+
+print(cell_data)
+
+# Standardize treatment values to lowercase
+cell_data <- cell_data %>%
+  mutate(treatment = str_to_lower(treatment))
+
+print(cell_data)
+
+# Convert treatment and cell_line to factors
+cell_data <- cell_data %>%
+  mutate(
+    treatment = factor(treatment),
+    cell_line = factor(cell_line)
+  )
+
+levels(cell_data$treatment)
+levels(cell_data$cell_line)
+
+# Reorder treatment levels so treatment comes before control
+cell_data <- cell_data %>%
+  mutate(treatment = fct_relevel(treatment, "treatment", "control"))
+
+levels(cell_data$treatment)
+
+# Reorder cell_line levels by frequency
+cell_data <- cell_data %>%
+  mutate(cell_line = fct_infreq(cell_line))
+
+levels(cell_data$cell_line)
+
+# Convert observation_time to a datetime object
+cell_data <- cell_data %>%
+  mutate(observation_time = ymd_hms(observation_time))
+
+print(cell_data)
+
+# Verify the data type of observation_time
+class(cell_data$observation_time)
+
+# Extract year, month, day, and hour
+cell_data <- cell_data %>%
+  mutate(
+    year = year(observation_time),
+    month = month(observation_time),
+    day = day(observation_time),
+    hour = hour(observation_time)
+  )
+
+print(cell_data)
+
+# Calculate hours since the first observation
+cell_data <- cell_data %>%
+  mutate(
+    hours_since_first_observation = as.numeric(
+      difftime(
+        observation_time,
+        min(observation_time),
+        units = "hours"
+      )
+    )
+  )
+
+print(cell_data)
+
+
+# Practice 3D
+
+# Check the working directory
+getwd()
+
+# Import the provided iris dataset
+iris_data <- read.csv(
+  "Lab3D_Organizing/Data/iris_data.csv"
+)
+
+# Examine the imported data
+head(iris_data)
+
+# Extract observations for the versicolor species
+versicolor_data <- subset(
+  iris_data,
+  Species == "versicolor"
+)
+
+print(versicolor_data)
+
+# Save the filtered dataset to the Data folder
+write.csv(
+  versicolor_data,
+  file = "Lab3D_Organizing/Data/versicolor_data.csv",
+  row.names = FALSE
+)
+
+# Plot sepal length and sepal width for Iris versicolor
+plot(
+  versicolor_data$Sepal.Length,
+  versicolor_data$Sepal.Width,
+  xlab = "Sepal Length (cm)",
+  ylab = "Sepal Width (cm)",
+  pch = 19
+)
+
