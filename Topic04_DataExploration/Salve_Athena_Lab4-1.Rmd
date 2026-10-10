@@ -87,6 +87,7 @@ ggplot(
   )
 
 
+
 # Exercise 4: Box Plot
 ggplot(
   airquality,
@@ -202,6 +203,14 @@ ggsave(
   dpi = 300
 )
 ```
+
+#### Exercise 3 Histogram Description
+
+- Most wind speeds are around 7–12 mph, while very low and very high wind speeds are less common. The distribution is roughly bell-shaped with a slight right skew.
+
+#### Exercise 8 Heatmap Interpretation
+
+- The heatmap shows the highest temperatures in late August. The highest recorded temperature is 97°F on August 28.
 
 # Lab Exercise 4B
 

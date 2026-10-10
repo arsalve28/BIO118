@@ -179,6 +179,7 @@ ggsave(
 
 # Loading and Exploring the Dataset
 
+library(tidyverse)
 data("who")
 glimpse(who)
 head(who)
