@@ -1,0 +1,567 @@
+---
+title: "Salve_Athena_Lab4-1"
+author: "Athena Salve"
+date: "2026-10-10"
+output: html_document
+---
+
+# Data Visualization & Exploratory Data Analysis
+
+### Student Information
+
+Name: Athena Nicole R. Salve
+
+Section: B2
+
+Date: October 10, 2026
+
+GitHub Repository URL: <https://github.com/arsalve28/BIO118>
+
+# Lab Exercise 4A
+
+## Introduction
+
+Data visualization is an important part of biological data analysis. Graphs allow researchers to explore patterns, compare groups, identify unusual observations, and communicate results.
+
+In this laboratory exercise, you will use ggplot2 to create and customize several common types of visualizations. You will learn how to map variables to visual properties such as position, color, and fill, and how to add labels, facets, and themes to improve your plots. You will work primarily with the built-in iris dataset and apply the visualization techniques to biological measurements.
+
+## Practice Exercises
+
+```{r}
+# Laboratory Exercise 4A: Practice Exercises 1–9
+
+library(ggplot2)
+
+
+# Exercise 1: Scatter plot
+ggplot(
+  airquality,
+  aes(
+    x = Wind,
+    y = Ozone,
+    color = factor(Month)
+  )
+) +
+  geom_point() +
+  labs(
+    title = "Relationship Between Wind Speed and Ozone Concentration",
+    x = "Wind Speed (mph)",
+    y = "Ozone Concentration (ppb)",
+    color = "Month"
+  )
+
+
+# Exercise 2: Line plot
+ggplot(
+  airquality,
+  aes(
+    x = Day,
+    y = Ozone,
+    group = factor(Month),
+    color = factor(Month)
+  )
+) +
+  geom_line() +
+  labs(
+    title = "Daily Variation in Ozone Concentration by Month",
+    x = "Day of Month",
+    y = "Ozone Concentration (ppb)",
+    color = "Month"
+  )
+
+
+# Exercise 3: Histogram
+ggplot(
+  airquality,
+  aes(x = Wind)
+) +
+  geom_histogram(
+    binwidth = 2,
+    fill = "lightblue",
+    color = "black"
+  ) +
+  labs(
+    title = "Distribution of Wind Speed",
+    x = "Wind Speed (mph)",
+    y = "Frequency"
+  )
+
+
+# Exercise 4: Box Plot
+ggplot(
+  airquality,
+  aes(
+    x = factor(Month),
+    y = Temp,
+    fill = factor(Month)
+  )
+) +
+  geom_boxplot() +
+  labs(
+    title = "Monthly Distribution of Daily Maximum Temperature",
+    x = "Month",
+    y = "Daily Maximum Temperature (°F)",
+    fill = "Month"
+  ) +
+  theme_classic()
+
+
+# Exercise 5: Scatter plot with a linear trend line
+ggplot(
+  airquality,
+  aes(
+    x = Wind,
+    y = Temp
+  )
+) +
+  geom_point() +
+  geom_smooth(
+    method = "lm",
+    se = FALSE
+  ) +
+  labs(
+    title = "Relationship Between Wind Speed and Daily Maximum Temperature",
+    x = "Wind Speed (mph)",
+    y = "Daily Maximum Temperature (°F)"
+  ) +
+  theme_classic()
+
+
+# Exercise 6: Scatter plot with separate panels for each month
+ggplot(
+  airquality,
+  aes(
+    x = Wind,
+    y = Ozone
+  )
+) +
+  geom_point() +
+  facet_wrap(~ Month) +
+  labs(
+    title = "Relationship Between Wind Speed and Ozone Concentration by Month",
+    x = "Wind Speed (mph)",
+    y = "Ozone Concentration (ppb)"
+  )
+
+
+# Exercise 7: Calculate mean temperature for each month
+mean_temp <- aggregate(
+  Temp ~ Month,
+  data = airquality,
+  mean
+)
+
+# Display the summary table
+mean_temp
+
+# Bar plot of monthly mean temperature
+ggplot(
+  mean_temp,
+  aes(
+    x = factor(Month),
+    y = Temp,
+    fill = factor(Month)
+  )
+) +
+  geom_col() +
+  labs(
+    title = "Monthly Mean Daily Maximum Temperature",
+    x = "Month",
+    y = "Mean Daily Maximum Temperature (°F)",
+    fill = "Month"
+  )
+
+
+# Exercise 8: Heatmap
+heatmap_plot <- ggplot(
+  airquality,
+  aes(
+    x = Day,
+    y = factor(Month),
+    fill = Temp
+  )
+) +
+  geom_tile() +
+  labs(
+    title = "Variation in Daily Maximum Temperature Across Months",
+    x = "Day of Month",
+    y = "Month",
+    fill = "Daily Maximum\nTemperature (°F)"
+  ) +
+  theme_bw()
+
+heatmap_plot
+
+# Exercise 9: Store plot
+
+ggsave(
+  "Salve_AthenaNicole_Plot.jpeg",
+  plot = heatmap_plot,
+  width = 8,
+  height = 5,
+  dpi = 300
+)
+```
+
+# Lab Exercise 4B
+
+## Introduction
+
+Exploratory Data Analysis (EDA) is an iterative process used to understand the structure and characteristics of a dataset before conducting more advanced analyses. EDA involves examining variables, summarizing data, visualizing distributions and relationships, and identifying patterns or unusual observations.
+
+In this exercise, you will perform an exploratory analysis of tuberculosis (TB) case data from the World Health Organization (WHO). The dataset contains TB case records by country, year, age group, sex, and type of TB diagnosis. You will apply the data-wrangling and visualization techniques learned in previous laboratory exercises to:
+
+- inspect and prepare a real-world dataset;
+
+- examine distributions and variation;
+
+- explore relationships among variables;
+
+- use appropriate visualizations to investigate patterns; and
+
+- formulate observations and questions based on the data.
+
+## Loading and Exploring the Dataset
+
+```{r}
+
+library(tidyverse)
+data("who")
+glimpse(who)
+head(who)
+```
+
+**1. How many observations and variables are in the dataset?**
+
+The dataset contains 7,240 observations and 60 variables. Each row represents a country and year, while the columns contain identification details and TB case counts.
+
+**2. Which variables identify the country and year?**
+
+The country variable gives the country name, while iso2 and iso3 contain its two-letter and three-letter country codes. The year variable identifies the year of the record.
+
+**3. Which variables contain information about TB cases?**
+
+The 56 columns beginning with new_sp\_, new_sn\_, new_ep\_, and newrel\_ contain the TB case counts. Their names indicate the type of TB record, sex, and age group.
+
+**4. What types of variables are country and year?**
+
+The country variable is stored as character data and represents a categorical variable. The year variable is stored as numeric data and represents the time when the cases were recorded.
+
+**5. What do you notice about the structure of the TB case variables?**
+
+The TB case variables are stored in wide format, with each combination of type, sex, and age group placed in a separate column. For example, new_sp_m014 contains recorded new smear-positive pulmonary TB cases among males aged 0–14.
+
+## Examining Missing Data
+
+```{r}
+colSums(is.na(who))
+```
+
+**6. Which variables contain missing values?**
+
+The iso2 variable and all 56 TB case variables contain missing values. There are no missing values in country, iso3, or year.
+
+**7. Are missing values common or uncommon in the TB case variables?**
+
+Missing values are common in the TB case variables, with each column containing thousands of missing entries. For example, new_sp_m014 has 4,067 missing values out of 7,240 observations.
+
+**8. Why might missing observations occur in a large international dataset?**
+
+Missing observations may occur because countries differ in their reporting systems, diagnostic resources, and availability of historical records. Some countries may also have incomplete reports for specific years or groups, hence a missing value does not mean that no cases occurred.
+
+## Tidying the Dataset
+
+```{r}
+who_tidy <- who %>%
+  pivot_longer(
+    cols = c(-country, -iso2, -iso3, -year),
+    names_to = "profile",
+    values_to = "cases"
+  )
+glimpse(who_tidy)
+
+who_tidy <- who_tidy %>%
+  mutate(profile = gsub("newrel_", "new_rel_", profile))
+
+who_tidy <- who_tidy %>%
+  separate(profile, into = c("new", "type", "sex_age")) %>%
+  separate(sex_age, into = c("sex", "age"), sep = "(?<=m|f)")
+glimpse(who_tidy)
+```
+
+## Defining the Data for Analysis
+
+```{r}
+tb_data <- who_tidy %>%
+  filter(type == "sp", !is.na(cases))
+glimpse(tb_data)
+```
+
+**9. What does type == "sp" represent in the dataset?**
+
+The code selects records for smear-positive pulmonary TB. Since these records also have new in the new column, tb_data contains recorded new smear-positive pulmonary TB cases with non-missing counts.
+
+## Exploring Variation and Distributions
+
+### TB cases across years
+
+```{r}
+tb_by_year <- tb_data %>%
+  group_by(year) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE))
+print(tb_by_year, n = 33)
+
+ggplot(tb_by_year, aes(x = year, y = total_cases)) +
+  geom_line() +
+  labs(
+    title = "Annual Recorded New Smear-Positive Pulmonary TB Cases",
+    x = "Year",
+    y = "Total Recorded Cases"
+  ) +
+  theme_classic()
+```
+
+**10. What general pattern do you observe over time?**
+
+The plot shows very low recorded totals from 1980 to 1994, followed by a large increase from 1995 onward. The total reaches its highest value in 2008 and then fluctuates slightly through 2012.
+
+**11. Are there periods when the number of recorded cases changes substantially?**
+
+There is a sharp increase from 750 recorded cases in 1994 to 513,971 in 1995. Another substantial increase occurs from 2001 to 2005, when the total rises from about 1.24 million to 2.36 million.
+
+**12. What are some possible explanations for changes in recorded cases?**
+
+Changes in recorded cases may reflect changes in transmission, population size, case detection, or reporting coverage. The sudden increase after 1994 may also involve more countries reporting data, so it cannot be interpreted as an increase in transmission alone.
+
+### TB Cases by Sex
+
+```{r}
+tb_by_sex <- tb_data %>%
+  group_by(sex) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE))
+tb_by_sex
+
+ggplot(tb_by_sex, aes(x = sex, y = total_cases, fill = sex)) +
+  geom_col() +
+  labs(
+    title = "Recorded New Smear-Positive Pulmonary TB Cases by Sex",
+    x = "Sex",
+    y = "Total Recorded Cases",
+    fill = "Sex"
+  ) +
+  theme_classic()
+```
+
+**13. Which sex has the greater number of recorded cases in this dataset?**
+
+Males have the greater number of recorded cases, with a total of 20,586,831. Females have a total of 11,324,409 recorded cases.
+
+**14. What does this comparison tell you?**
+
+The bar plot shows that more new smear-positive pulmonary TB cases were recorded among males than females in the included records. The male total is about 1.8 times the female total.
+
+**15. What does it not tell you about the risk of TB between males and females?**
+
+The comparison does not directly show that males have 1.8 times the risk of developing TB. Population sizes, age distributions, and differences in diagnosis or reporting would need to be considered before comparing risk.
+
+### TB Cases by Age Group
+
+- Age codes: 014 = 0–14, 1524 = 15–24, 2534 = 25–34, 3544 = 35–44, 4554 = 45–54, 5564 = 55–64, and 65 = 65 years or older.
+- Sex codes: f = female and m = male.
+
+```{r}
+tb_by_age <- tb_data %>%
+  group_by(age) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE))
+tb_by_age
+
+ggplot(tb_by_age, aes(x = age, y = total_cases)) +
+  geom_col() +
+  labs(
+    title = "Recorded New Smear-Positive Pulmonary TB Cases by Age Group",
+    x = "Age Group",
+    y = "Total Recorded Cases"
+  ) +
+  theme_classic()
+```
+
+**16. Which age group has the largest number of recorded cases?**
+
+The 25–34 age group, coded as 2534, has the largest number of recorded cases. Its total is 7,435,960 cases.
+
+**17. Which age group has the smallest number?**
+
+The 0–14 age group, coded as 014, has the smallest number of recorded cases. Its total is 628,491 cases.
+
+**18. What pattern do you observe across age groups?**
+
+Recorded cases increase from the 0–14 group to a peak in the 25–34 group, then generally decrease in the older groups. These are total counts, so the pattern does not directly show which age group has the highest risk.
+
+## Bivariate Analysis
+
+```{r}
+tb_year_sex <- tb_data %>%
+  group_by(year, sex) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE))
+glimpse(tb_year_sex)
+
+ggplot(tb_year_sex, aes(x = year, y = total_cases, color = sex)) +
+  geom_line() +
+  labs(
+    title = "Annual Recorded New Smear-Positive Pulmonary TB Cases by Sex",
+    x = "Year",
+    y = "Total Recorded Cases",
+    color = "Sex"
+  ) +
+  theme_classic()
+```
+
+**19. How do the patterns for males and females change over time?**
+
+Both groups have very low recorded totals before 1995, followed by an increase through the 2000s. Male counts remain higher than female counts, and both groups show smaller fluctuations after 2008.
+
+**20. Do the two groups show similar or different trends?**
+
+The two groups show similar overall trends, as both rise after 1994 and become relatively stable toward the end of the period. However, the male line rises more steeply in absolute case counts and remains above the female line.
+
+**21. Are there periods where the difference between the groups appears larger?**
+
+The difference becomes much larger during the 2000s as recorded cases increase. The absolute gap is widest in 2008, when the male total is about 783,000 cases higher than the female total.
+
+## Multivariable Exploration
+
+```{r}
+tb_year_age_sex <- tb_data %>%
+  group_by(year, age, sex) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE))
+glimpse(tb_year_age_sex)
+
+ggplot(
+  tb_year_age_sex,
+  aes(x = year, y = total_cases, color = sex)
+) +
+  geom_point() +
+  facet_wrap(~ age) +
+  labs(
+    title = "Annual Recorded New Smear-Positive Pulmonary TB Cases by Age Group and Sex",
+    x = "Year",
+    y = "Total Recorded Cases",
+    color = "Sex"
+  ) +
+  theme_classic()
+```
+
+**22. Do the patterns across age groups appear similar?**
+
+Most age groups show low recorded counts before 1995, followed by an increase and smaller changes in later years. However, the size of the increase and the difference between the sexes vary among age groups.
+
+**23. Which age groups show the largest number of recorded cases?**
+
+The 25–34 age group shows the largest recorded counts overall, especially among males in the later years. The 35–44 and 45–54 groups also show relatively high male counts compared with the other groups.
+
+**24. How does the pattern differ between males and females?**
+
+Males generally have higher recorded counts than females in the adult age groups, particularly after 1995. In the 0–14 group, female counts are higher than male counts in the later years, although both totals are relatively small.
+
+**25. Are there age groups where the two sexes appear more similar or different?**
+
+The male and female counts appear more similar in the 0–14 and 15–24 groups. The separation is more noticeable in older adult groups, particularly ages 35–44 and 45–54.
+
+## Investigating Unusual Observations
+
+```{r}
+
+ggplot(tb_data, aes(x = "", y = cases)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Recorded New Smear-Positive Pulmonary TB Case Counts",
+    x = NULL,
+    y = "Recorded Cases per Country-Year-Sex-Age Group"
+  ) +
+  theme_classic()
+```
+
+**26. Does the boxplot show observations that may be unusually high or low?**
+
+The boxplot shows many unusually high case counts above the upper whisker. The central box is compressed near the bottom, and there are no clearly visible low outliers.
+
+**27. What biological, sampling, measurement, or data-recording factors might explain an unusual observation?**
+
+A high count may reflect a larger population, greater TB transmission, or more complete case detection and reporting. It may also result from a recording error or differences in how cases were classified.
+
+**28. What additional information would you check before deciding whether an unusual observation represents an error or a meaningful observation?**
+
+I would check the country, year, sex, and age group of the record, then compare it with nearby years and the original report. I would also check population size and any changes in reporting methods to see whether the count is reasonable.
+
+**29. Would you automatically remove these observations? Why or why not?**
+
+I would not automatically remove these observations because a high count may be a valid record from a large population. I would first verify the data and only correct or exclude a record if there is evidence of an error.
+
+## Practice Exercise
+
+```{r}
+glimpse(airquality)
+head(airquality)
+colSums(is.na(airquality))
+```
+
+**1.**
+
+**Which variables contain missing values?**\
+Ozone contains 37 missing values, while Solar.R contains 7. Wind, Temp, Month, and Day have no missing values.
+
+**Why should missing values be considered when interpreting the visualizations you created in Laboratory Exercise 4A?**\
+Observations with missing values cannot be shown in plots that require those variables. Therefore, the ozone plots show only the available measurements, which may not fully represent the conditions across all days.
+
+**2.**
+
+**What does the histogram tell you about the distribution of wind speed?**\
+Most wind speeds are around 7–12 mph, while very low and very high wind speeds are less common. The distribution is roughly bell-shaped with a slight right skew.
+
+**How does temperature vary among the different months?**\
+May generally has the lowest temperatures, while July and August have the highest. Temperatures decrease in September, and August shows a wider spread than July.
+
+**Which visualization is more useful for comparing temperature among months? Explain why.**\
+The box plot is more useful because it separates temperature measurements by month. It allows the median, spread, and potential outliers of each month to be compared directly.
+
+**3.**
+
+**What relationship do you observe between wind speed and ozone concentration?**\
+Ozone concentration generally decreases as wind speed increases. Higher ozone values are mostly observed at lower wind speeds.
+
+**What relationship do you observe between wind speed and temperature?**\
+Temperature generally decreases as wind speed increases, as shown by the downward trend line. However, the points are widely scattered, so the relationship is not consistent for every observation.
+
+**Which relationship appears clearer or more consistent based on the visualizations? Briefly explain what you see.**\
+The relationship between wind speed and ozone concentration appears clearer. High ozone values are concentrated at lower wind speeds, while temperature shows more variation around its trend line.
+
+**4.**
+
+**Does the relationship between wind and ozone appear similar across all months?**\
+The relationship is not equally clear across all months. A negative relationship is more noticeable in July, August, and September, while June shows a less clear pattern.
+
+**Are there months in which the observations appear more widely spread or show a different pattern?**\
+July and August show a wider spread of ozone concentrations, particularly at lower wind speeds. June has fewer available observations, making its pattern harder to assess.
+
+**Why is faceting useful for exploring this type of dataset?**\
+Faceting separates the observations into monthly panels, making differences among months easier to identify. It also helps reveal patterns that may be less obvious when all observations are combined.
+
+**5.**
+
+**Identify one observation or group of observations that appears unusual.**\
+One observation in August has an ozone concentration of 168 ppb at a wind speed of 3.4 mph. Its ozone concentration is noticeably higher than the other observations.
+
+**Which visualization helped you identify it?**\
+The Wind versus Ozone scatter plot helped identify this observation. It appears as a point well above most of the other ozone measurements.
+
+**Give one possible explanation for why an observation might appear unusual.**\
+Low wind speed may allow ozone and its precursors to accumulate rather than disperse. This could contribute to a high ozone concentration, although other environmental conditions may also be involved.
+
+**Would you automatically remove the observation? Why or why not?**\
+I would not automatically remove it because an unusual value may still be a valid measurement. I would first check the original record and the conditions on that day before deciding whether it is an error.
+
+**6.**
+
+1.  Does the relationship between wind speed and ozone concentration differ among months?
+
+2.  Is ozone concentration associated with temperature after accounting for wind speed?
