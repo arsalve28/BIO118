@@ -1,0 +1,451 @@
+---
+title: "Salve_Athena_Lab5"
+author: "Athena Salve"
+date: "2026-11-01"
+output: html_document
+---
+
+# Summarizing and Organizing Data
+
+### Student Information
+
+Name: Athena Nicole R. Salve
+
+Section: B2
+
+Date: October 31, 2026
+
+GitHub Repository URL: <https://github.com/arsalve28/BIO118>
+
+# Lab Exercise 5
+
+## Introduction
+
+Descriptive statistics are used to organize, summarize, and describe the characteristics of a dataset. They help researchers understand the center, variability, and distribution of observations before proceeding to more advanced statistical analyses.
+
+In biological research, descriptive statistics can summarize measurements such as organism size, population density, species counts, growth rates, and physiological responses. Numerical summaries and graphical displays allow researchers to identify patterns, compare groups, and communicate results clearly.
+
+In this laboratory exercise, you will use R to calculate descriptive statistics and create graphical summaries of biological data. You will first work with the built-in iris dataset through guided activities. You will then apply the same principles independently to the built-in CO2 dataset, which contains measurements of carbon dioxide uptake in plants under different experimental conditions.
+
+### 5.1 Load and inspect the iris dataset
+
+### 5.2 Measures of central tendency
+
+#### 5.2.1 Mean
+
+```{r}
+
+library (dplyr)
+
+iris %>%
+  group_by(Species) %>%
+  summarise (
+    Mean = mean(Sepal.Length)
+  )
+```
+
+#### 5.2.2 Median
+
+```{r}
+iris %>% 
+  group_by(Species) %>%
+  summarise(
+    Median = median(Sepal.Length)
+  )
+```
+
+#### 5.2.3 Mode
+
+```{r}
+# create a function to calculate the mode
+mode_function <- function(x) {
+  frequencies <- table(x)
+  names(frequencies)[which.max(frequencies)]
+}
+
+# use the function to calculate the mode of sepal length for each species
+iris %>%
+  group_by(Species) %>%
+  summarise(
+    Mode = mode_function(Sepal.Length)
+  )
+```
+
+1.  **Which species has the lowest mean sepal length? Which has the highest?**
+
+    *Setosa* has the lowest mean sepal length at 5.01 cm, while *virginica* has the highest at 6.59 cm.
+
+2.  **How do the mean and median compare within each species?**
+
+    The mean and median are close for each species: 5.01 and 5.00 cm for *setosa*, 5.94 and 5.90 cm for *versicolor*, and 6.59 and 6.50 cm for *virginica*. The mean is slightly higher than the median in all three species.
+
+3.  **Why might the median be preferred over the mean when numerical data contain extreme values?**
+
+    The median is less affected by extreme values because it depends on the position of observations after sorting. It can therefore better represent the center of these data.
+
+4.  **How does the mode differ from the mean and median?**
+
+    The mode is the most frequently occurring value, while the mean is the average and the median is the middle value. The mode can also describe categorical data.
+
+### 5.3 Measures of variability
+
+#### 5.3.1 Range
+
+```{r}
+# 5.3.1 Range
+iris %>%
+  group_by(Species) %>%
+  summarise(
+    Minimum = min(Sepal.Length),
+    Maximum = max(Sepal.Length),
+    Range = Maximum - Minimum
+  )
+```
+
+#### 5.3.2 Variance
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(
+    Variance = var(Sepal.Length)
+  )
+```
+
+#### 5.3.3 Standard Deviation
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(
+    SD = sd(Sepal.Length)
+  )
+```
+
+#### 5.3.3 Interquartile Range (IQR)
+
+```{r}
+iris %>%
+  group_by(Species) %>%
+  summarise(
+    Q1 = quantile(Sepal.Length, 0.25),
+    Q3 = quantile(Sepal.Length, 0.75),
+    IQR = IQR(Sepal.Length)
+  )
+```
+
+**5. Which species has the largest range of sepal length?**
+
+*Virginica* has the largest range at 3.00 cm, with sepal lengths from 4.90 to 7.90 cm.
+
+**6. Which species has the largest standard deviation? What does this indicate about the spread of its observations?**
+
+*Virginica* has the largest standard deviation at 0.64 cm. Its sepal lengths are more widely spread around the mean than those of the other species.
+
+**7. How does the range differ from the IQR?**
+
+The range is the difference between the maximum and minimum values, while the IQR describes the spread of the middle 50% of observations. The IQR is less affected by extreme values.
+
+**8. Why might researchers report the median and IQR together when describing skewed data or data containing extreme observations?**
+
+The median describes the center, while the IQR describes the spread of the middle 50% of observations. Both are less affected by extreme values, making them useful for describing skewed data.
+
+### 5.4 Frequency distribution
+
+```{r}
+# create a frequency table
+species_freq <- table(iris$Species)
+species_freq
+
+# calculate the relative frequency and percentage
+# Relative frequency 
+prop.table (species_freq)
+
+# Percentage 
+prop.table (species_freq) * 100
+
+# combine counts and percentages in a single table 
+iris %>% 
+  count (Species, name = "Frequency") %>%
+  mutate(
+    Percentage = round(Frequency / sum(Frequency)*100,2)
+  )
+```
+
+**9. How many flowers are represented by each species?**
+
+Each species is represented by 50 flowers.
+
+**10. What percentage of the dataset belongs to each species?**
+
+Each species represents approximately 33.33% of the dataset.
+
+**11. Why is it useful to report percentages when comparing datasets with different sample sizes?**
+
+Percentages express counts relative to the total sample size. This allows the proportions of categories to be compared across datasets with different numbers of observations.
+
+### 5.5 Measures of distribution
+
+```{r}
+library(e1071)
+
+# calculate skewness and kurtosis
+iris %>%
+  group_by(Species) %>%
+  summarise(
+    Skewness = skewness(Sepal.Length),
+    Kurtosis = kurtosis(Sepal.Length)
+  )
+```
+
+**12. Which species has the most positive or most negative skewness value?**
+
+*Setosa* has the highest positive skewness at 0.113, while *versicolor* has the lowest at 0.099. None of the species has negative skewness, and all values are close to zero.
+
+**13. What does positive skewness indicate about the shape of a distribution? What does negative skewness indicate?**
+
+Positive skewness indicates a longer tail toward higher values, while negative skewness indicates a longer tail toward lower values.
+
+**14. What does kurtosis describe?**
+
+Kurtosis describes the heaviness of a distribution's tails relative to a normal distribution. The `e1071` function reports excess kurtosis, where zero is the normal reference value.
+
+**15. Why should skewness and kurtosis be interpreted alongside graphical displays rather than in isolation?**
+
+These values summarize distribution shape but do not show all its features. Graphs help identify peaks, gaps, and unusual observations that may be missed by numerical summaries.
+
+### 5.6 Visualizing the data
+
+#### 5.6.1 Histogram
+
+```{r}
+library(ggplot2)
+ggplot(iris, aes(x = Sepal.Length)) +
+  geom_histogram(binwidth = 0.3) +
+  facet_wrap(~ Species) +
+  labs(
+    title = "Distribution of Sepal Length by Iris Species",
+    x = "Sepal Length (cm)",
+    y = "Frequency"
+  )
+```
+
+**16. How do the distributions of sepal length differ among the three species in terms of center and spread?**
+
+Sepal lengths are mostly concentrated around 4.5–5.5 cm in *setosa*, 5.5–6.5 cm in *versicolor*, and 6–7 cm in *virginica*. *Setosa* has the narrowest spread, *versicolor* has an intermediate spread, and *virginica* has the widest overall spread.
+
+**17. Describe the approximate shape of each distribution. Are there indications of skewness or multiple peaks?**
+
+All three distributions are approximately symmetric with slight positive skewness. *Setosa* and *versicolor* have one main peak, while *virginica* is more irregular, with a smaller cluster at higher values. There is no clear separation into distinct peaks.
+
+#### 5.6.2 Boxplots
+
+```{r}
+
+ggplot(iris, aes(x = Species, y = Sepal.Length)) +
+  geom_boxplot() +
+  labs(
+    title = "Sepal Length by Iris Species",
+    x = "Species",
+    y = "Sepal Length (cm)"
+  )
+```
+
+**18. Which species appears to have the greatest variability in the middle 50% of observations?**
+
+*Versicolor* has the greatest variability in the middle 50% of observations, as shown by its slightly taller box and larger IQR.
+
+**19. Are any potential outliers visible? If so, which species contains them?**
+
+Yes. *Virginica* has one potential outlier, shown as a point below the lower whisker.
+
+**20. How does the boxplot complement the information provided by the histograms?**
+
+The boxplot makes it easier to compare medians, IQRs, and potential outliers among species. The histograms show the shape and frequency pattern of each distribution in more detail.
+
+### Practice Exercise
+
+#### Load and Inspect the dataset
+
+```{r}
+# 1. Load and inspect the dataset 
+data(CO2)
+head(CO2)
+str(CO2)
+names(CO2)
+```
+
+**How many observations and variables are in the dataset?**
+
+The dataset contains 84 observations and 5 variables.
+
+**Which variables are numerical, and which are categorical?**
+
+The numerical variables are `conc` and `uptake`. The categorical variables are `Plant`, `Type`, and `Treatment`.
+
+**What does the variable uptake measure?**
+
+The variable `uptake` measures the carbon dioxide uptake rate of *Echinochloa crus-galli*, expressed in micromoles per square meter per second (µmol m⁻² s⁻¹).
+
+#### Central Tendency
+
+```{r}
+# Mean and Median of Carbon Dioxide uptake for the entire dataset
+
+CO2 %>%
+  summarise(
+    mean(CO2$uptake),
+    median(CO2$uptake)
+  )
+
+
+# Mean and Median of Carbon Dioxide uptake for each treatment
+CO2 %>%
+  group_by(Treatment) %>%
+  summarise(
+    Mean = mean(uptake),
+    Median = median(uptake)
+  )
+```
+
+**How do the mean and median compare for the entire dataset?**
+
+The mean uptake is 27.21 µmol m⁻² s⁻¹, which is slightly lower than the median of 28.30 µmol m⁻² s⁻¹.
+
+**How do mean uptake values compare between the two treatment groups?**
+
+The nonchilled group has a higher mean uptake of 30.64 µmol m⁻² s⁻¹ than the chilled group at 23.78 µmol m⁻² s⁻¹.
+
+**Why should these summaries be interpreted descriptively rather than as proof that the treatments differ statistically?**
+
+These summaries describe the observed values but do not test whether the difference is statistically significant. Uptake was also measured repeatedly from the same plants at different carbon dioxide concentrations, so the observations are not independent.
+
+#### Variability
+
+```{r}
+# 3. Variability
+
+# Minimum, Maximum, Range, Variance, SD, and IQR of Uptake for Each Treatment
+CO2 %>% 
+  group_by(Treatment) %>%
+  summarise(
+    Minimum = min(uptake),
+    Maximum = max(uptake),
+    Range = Maximum - Minimum,
+    Variance = var(uptake),
+    SD = sd(uptake),
+    Q1 = quantile(uptake, 0.25),
+    Q3 = quantile(uptake, 0.75),
+    IQR = IQR(uptake)
+  )
+```
+
+**Which treatment group has the larger range?**
+
+The nonchilled group has the larger range at 34.90 µmol m⁻² s⁻¹, compared with 34.70 µmol m⁻² s⁻¹ for the chilled group.
+
+**Which group has the larger standard deviation?**
+
+The chilled group has the larger standard deviation at 10.88 µmol m⁻² s⁻¹, compared with 9.70 µmol m⁻² s⁻¹ for the nonchilled group.
+
+**How do the SD and IQR provide different information about variability?**
+
+The SD describes the spread of all observations around the mean, while the IQR describes the spread of the middle 50%. The SD is more affected by extreme values than the IQR.
+
+#### Frequency Distribution
+
+```{r}
+# create a frequency table
+treatment_freq <- table(CO2$Treatment)
+treatment_freq
+
+# calculate the relative frequency and percentage
+# Relative frequency 
+prop.table (treatment_freq)
+
+# Percentage 
+prop.table (treatment_freq) * 100
+
+# combine counts and percentages in a single table 
+CO2 %>% 
+  count (Treatment, name = "Frequency") %>%
+  mutate(
+    Percentage = round(Frequency / sum(Frequency)*100,2)
+  )
+```
+
+**How many observations belong to each treatment group, and what percentage of the dataset does each group represent?**
+
+Each treatment group contains 42 observations and represents 50% of the dataset.
+
+**Does the frequency table describe the distribution of uptake values or the number of observations in each treatment? Explain.**
+
+The table describes the number of observations in each treatment. It counts treatment categories rather than grouping uptake values into intervals.
+
+#### Measures of Distribution
+
+```{r}
+CO2 %>%
+  summarise(
+    Skewness = skewness(uptake),
+    Kurtosis = kurtosis(uptake)
+  )
+```
+
+**What are the skewness and kurtosis values for the overall uptake distribution? What does the sign of the skewness suggest about the distribution?**
+
+The skewness is -0.104, indicating a slight negative skew with a longer tail toward lower uptake values. The excess kurtosis is -1.348, indicating lighter tails relative to a normal distribution.
+
+**Why should these numerical measures be interpreted alongside a histogram?**
+
+The histogram shows peaks, gaps, and unusual observations that are not fully described by skewness and kurtosis. A skewness value close to zero does not necessarily indicate a normal distribution.
+
+#### Visualizing the Data
+
+**Histogram**
+
+```{r}
+ggplot(CO2, aes(x = uptake)) +
+  geom_histogram(binwidth = 5) +
+  labs(
+    title = "Distribution of Carbon Dioxide Uptake",
+    x = "Carbon dioxide uptake (µmol m⁻² s⁻¹)",
+    y = "Frequency"
+  )
+```
+
+**Describe the center, spread, shape, and any potentially unusual observations visible in the histogram.**
+
+Uptake is broadly centered around 25–30 µmol m⁻² s⁻¹, with values extending from below 10 to above 45 µmol m⁻² s⁻¹. The distribution is irregular, with several peaks and little overall skewness. No clearly isolated observations are visible.
+
+**Boxplot**
+
+```{r}
+ggplot(CO2, aes(x = Treatment, y = uptake)) +
+  geom_boxplot() +
+  labs(
+    title = "Carbon Dioxide Uptake by Treatment",
+    x = "Treatment",
+    y = "Carbon dioxide uptake (µmol m⁻² s⁻¹)"
+  )
+```
+
+**Which treatment group has the higher median uptake?**
+
+The nonchilled group has the higher median uptake, as shown by its higher median line in the boxplot.
+
+**How does the spread of uptake compare between treatments?**
+
+The chilled group has a wider IQR, indicating greater variability in the middle 50% of observations. Both treatments have similar overall ranges.
+
+**Are any potential outliers visible?**
+
+No potential outliers are visible, as neither treatment has points beyond the whiskers.
+
+**What patterns can you describe from the boxplot without claiming that a statistically significant difference exists?**
+
+The nonchilled group has a higher median uptake, while the chilled group has greater variability in the middle 50% of observations. Uptake values overlap between treatments, and the boxplot alone does not establish a statistically significant difference.
+
+#### Interpretation
+
+The CO2 dataset contains 84 uptake measurements from 12 plants, with 42 observations in each treatment group. Overall uptake had a mean of 27.21 µmol m⁻² s⁻¹ and a median of 28.30 µmol m⁻² s⁻¹. The nonchilled group had a higher mean and median uptake than the chilled group, while the chilled group had a larger SD and IQR. The overall distribution showed slight negative skewness, and neither treatment showed potential outliers in the boxplot. These results describe the observed patterns and do not establish a statistically significant treatment difference.
