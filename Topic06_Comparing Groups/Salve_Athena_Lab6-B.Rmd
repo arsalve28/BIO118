@@ -1,0 +1,289 @@
+---
+title: "Salve_Athena_Lab6-B"
+author: "Athena Salve"
+date: "2026-11-14"
+output: html_document
+---
+
+# Comparing Groups: Three or More Groups and Two-Factor Comparisons
+
+### Student Information
+
+Name: Athena Nicole R. Salve
+
+Section: B2
+
+Date: November 14, 2026
+
+GitHub Repository URL: <https://github.com/arsalve28/BIO118>
+
+# Lab Exercise 6B
+
+## Introduction
+
+In this laboratory exercise, you will compare three or more groups using one-way ANOVA or the Kruskal–Wallis test, and examine the effects of two factors using two-way ANOVA. You will explore the data, identify the variables and study design, check assumptions, and choose an appropriate statistical test. When an overall test shows a significant difference, you may use follow-up comparisons to identify which groups differ.
+
+You will use R to analyze and interpret the results, then communicate your findings with suitable tables, figures, and concise biological explanations. This exercise introduces both parametric and nonparametric methods; your final test choice should be guided by the research question, study design, and relevant assumptions.
+
+## Practice Exercise
+
+```{r}
+library(tidyverse)
+library(car)
+```
+
+### 6.3.1 One-Way Comparison: Ozone Concentration Across Months
+
+The question is whether ozone concentrations differ among May, June, July, August, and September.
+
+#### 1a. Load and inspect the data
+
+```{r}
+data("airquality")
+head(airquality)
+str(airquality)
+summary(airquality)
+```
+
+The data include daily measurements from May through September 1973. Ozone concentration is the numerical response, and Month identifies the five groups.
+
+#### 1b–1d. Remove missing ozone measurements, convert Month to a factor, and count observations
+
+```{r}
+library(tidyverse)
+
+ozone_data <- airquality |>
+  filter(!is.na(Ozone))
+
+ozone_data$Month <- as.factor(ozone_data$Month)
+table(ozone_data$Month)
+```
+
+There are 116 recorded ozone measurements after removing rows with missing ozone values. The observations per month are May: 26, June: 9, July: 26, August: 26, and September: 29.
+
+#### 2. Explore the data
+
+```{r}
+library(tidyverse)
+
+ggplot(ozone_data, aes(x = Ozone)) +
+  geom_histogram(bins = 10, color = "white") +
+  facet_wrap(~Month) +
+  labs(
+    title = "Ozone Concentrations by Month",
+    x = "Ozone concentration (ppb)",
+    y = "Number of days"
+  ) +
+  theme_minimal()
+
+ggplot(ozone_data, aes(x = Month, y = Ozone)) +
+  geom_boxplot() +
+  labs(
+    title = "Ozone Concentrations Across Months",
+    x = "Month",
+    y = "Ozone concentration (ppb)"
+  ) +
+  theme_minimal()
+
+ozone_data |>
+  group_by(Month) |>
+  summarise(
+    n = n(),
+    mean_ozone = mean(Ozone),
+    sd_ozone = sd(Ozone)
+  )
+```
+
+The monthly means are lowest in May and highest in July and August. The plots and summary table show that ozone concentrations vary across months and that the distributions are skewed.
+
+#### 3. State the hypotheses
+
+The null hypothesis is that the population ozone distributions are the same across all five months. The alternative hypothesis is that at least one month differs. I use α = 0.05.
+
+#### 4. Assess assumptions and choose the overall test
+
+```{r}
+library(tidyverse)
+library(car)
+
+ggplot(ozone_data, aes(sample = Ozone)) +
+  stat_qq() +
+  stat_qq_line() +
+  facet_wrap(~Month) +
+  labs(
+    title = "Normal Q-Q Plots of Ozone by Month",
+    x = "Theoretical quantiles",
+    y = "Ozone concentration (ppb)"
+  ) +
+  theme_minimal()
+
+shapiro.test(ozone_data$Ozone[ozone_data$Month == "5"])
+shapiro.test(ozone_data$Ozone[ozone_data$Month == "6"])
+shapiro.test(ozone_data$Ozone[ozone_data$Month == "7"])
+shapiro.test(ozone_data$Ozone[ozone_data$Month == "8"])
+shapiro.test(ozone_data$Ozone[ozone_data$Month == "9"])
+
+leveneTest(Ozone ~ Month, data = ozone_data)
+```
+
+The Shapiro–Wilk tests show evidence against normality in May and September, and the Q-Q plots show departures from the reference lines. Levene’s test also indicates unequal variances. Because these assumptions are not reasonably met, I use the Kruskal–Wallis test as the overall comparison.
+
+#### 5. Conduct the overall test and pairwise comparisons
+
+```{r}
+kruskal.test(Ozone ~ Month, data = ozone_data)
+
+pairwise.wilcox.test(
+  ozone_data$Ozone,
+  ozone_data$Month,
+  p.adjust.method = "bonferroni"
+)
+```
+
+The Kruskal–Wallis test finds a significant difference among the monthly ozone distributions, χ²(4) = 29.27, p \< 0.001. The Bonferroni-adjusted pairwise tests indicate differences between May and July, May and August, July and September, and August and September. The other month pairs are not statistically significant after adjustment.
+
+#### 6. Interpret and report the findings
+
+Ozone concentrations differed among the five months, and the assumption checks support using the Kruskal–Wallis test rather than one-way ANOVA. The monthly mean concentrations were highest in July and August, at about 59.12 and 59.96 ppb, respectively. Bonferroni-adjusted pairwise tests also showed that July and August differed from May and September. These results indicate that ozone concentrations were higher during the middle of the summer than in May and September in this dataset. The Kruskal–Wallis and pairwise Wilcoxon tests compare rank distributions; they do not directly test equality of means.
+
+### 6.3.2 Two-Way ANOVA: Fertilizer and Irrigation Effects on Plant Growth
+
+The question is whether fertilizer type, irrigation level, and their interaction affect plant growth.
+
+#### 1. Generate the simulated dataset
+
+```{r}
+set.seed(123)
+n <- 60
+
+fertilizer <- rep(
+  c("Fertilizer A", "Fertilizer B", "Fertilizer C"),
+  each = n / 3
+)
+
+irrigation <- rep(
+  rep(c("Low", "High"), each = n / 6),
+  3
+)
+
+plant_growth <- rnorm(n, mean = 5, sd = 1) +
+  ifelse(
+    fertilizer == "Fertilizer B", 0.5,
+    ifelse(fertilizer == "Fertilizer C", 1, 0)
+  ) +
+  ifelse(irrigation == "High", 1, 0)
+
+plant_data <- data.frame(
+  Fertilizer = fertilizer,
+  Irrigation = irrigation,
+  Plant_Growth = plant_growth
+)
+
+plant_data$Fertilizer <- as.factor(plant_data$Fertilizer)
+plant_data$Irrigation <- as.factor(plant_data$Irrigation)
+```
+
+#### 2. Load and inspect the data
+
+```{r}
+head(plant_data)
+str(plant_data)
+table(plant_data$Fertilizer, plant_data$Irrigation)
+```
+
+The simulated dataset has 60 observations, with 10 plants in each fertilizer–irrigation combination.
+
+#### 3a. Summarize growth for each combination
+
+```{r}
+library(tidyverse)
+
+plant_summary <- plant_data |>
+  group_by(Fertilizer, Irrigation) |>
+  summarise(
+    n = n(),
+    mean_growth = mean(Plant_Growth),
+    sd_growth = sd(Plant_Growth)
+  )
+
+plant_summary
+```
+
+#### 3b–3c. Compare the groups and make an interaction plot
+
+```{r}
+library(tidyverse)
+
+ggplot(plant_data, aes(x = Fertilizer, y = Plant_Growth, fill = Irrigation)) +
+  geom_boxplot() +
+  labs(
+    title = "Plant Growth by Fertilizer and Irrigation",
+    x = "Fertilizer type",
+    y = "Plant growth (cm)",
+    fill = "Irrigation"
+  ) +
+  theme_minimal()
+
+ggplot(
+  plant_summary,
+  aes(x = Irrigation, y = mean_growth, color = Fertilizer, group = Fertilizer)
+) +
+  geom_line() +
+  geom_point(size = 3) +
+  labs(
+    title = "Interaction Between Fertilizer and Irrigation",
+    x = "Irrigation level",
+    y = "Mean plant growth (cm)",
+    color = "Fertilizer type"
+  ) +
+  theme_minimal()
+```
+
+The boxplots compare the growth distributions for the six treatment combinations. In the interaction plot, parallel or nearly parallel lines suggest that the fertilizer effect is similar across irrigation levels. Lines that change direction or are not parallel suggest a possible interaction.
+
+#### 4. State the hypotheses
+
+For fertilizer type, the null hypothesis is that mean plant growth is equal among the three fertilizer types; the alternative is that at least one fertilizer mean differs. For irrigation, the null hypothesis is that mean plant growth is equal under low and high irrigation; the alternative is that the means differ. For the interaction, the null hypothesis is that the effect of fertilizer does not depend on irrigation level; the alternative is that the fertilizer effect changes across irrigation levels. I use α = 0.05.
+
+#### 5a. Fit the two-way ANOVA model
+
+```{r}
+anova_result <- aov(
+  Plant_Growth ~ Fertilizer * Irrigation,
+  data = plant_data
+)
+summary(anova_result)
+```
+
+#### 5b–5e. Examine residuals and assess assumptions
+
+```{r}
+library(car)
+
+hist(
+  residuals(anova_result),
+  main = "Histogram of ANOVA Residuals",
+  xlab = "Residuals"
+)
+
+qqnorm(residuals(anova_result))
+qqline(residuals(anova_result))
+
+shapiro.test(residuals(anova_result))
+leveneTest(Plant_Growth ~ Fertilizer * Irrigation, data = plant_data)
+```
+
+The histogram and Q-Q plot are used to inspect residual normality. The Shapiro–Wilk test assesses the residuals, and Levene’s test assesses whether variances are similar across the six treatment combinations. A p-value below 0.05 indicates a possible assumption concern; I interpret each test alongside its plot and the study design.
+
+#### 6. Conduct follow-up comparisons
+
+```{r}
+TukeyHSD(anova_result, which = "Fertilizer")
+TukeyHSD(anova_result, which = "Irrigation")
+```
+
+The ANOVA table reports the fertilizer effect, irrigation effect, and interaction separately. The simulated data add growth for Fertilizer B and C and for high irrigation, with no interaction built into the simulation. Tukey’s results identify which fertilizer means differ; the irrigation comparison evaluates the difference between low and high irrigation.
+
+#### 7. Interpret and report the findings
+
+The two-way ANOVA evaluates the fertilizer effect, the irrigation effect, and whether the effect of fertilizer changes with irrigation. In this simulated dataset, fertilizer type and irrigation level affect mean plant growth, while the interaction is not statistically significant. The Tukey comparisons show which fertilizer levels differ, and the interaction plot should show a similar increase from low to high irrigation across fertilizer types. The results are consistent with the way the data were generated: fertilizer and irrigation add to plant growth, but their effects do not depend on each other.

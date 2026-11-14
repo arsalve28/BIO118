@@ -1,0 +1,328 @@
+---
+title: "Salve_Athena_Lab6-A"
+author: "Athena Salve"
+date: "2026-11-14"
+output: html_document
+---
+
+# Comparing Groups: One-Sample and Two-Sample Tests
+
+### Student Information
+
+Name: Athena Nicole R. Salve
+
+Section: B2
+
+Date: November 14, 2026
+
+GitHub Repository URL: <https://github.com/arsalve28/BIO118>
+
+# Lab Exercise 6A
+
+## Introduction
+
+This laboratory exercise introduces statistical comparisons used to determine whether a sample differs from a reference value or whether two groups differ. The appropriate test depends on the research question, the type of data, and the study design. You will practice one-sample, paired-sample, and independent-group comparisons.
+
+For each comparison, you will explore the data, formulate hypotheses, check assumptions, and conduct the analysis in R. You will also interpret and report the results using test statistics, p-values, confidence intervals, estimates, and visualizations.
+
+## Practice Exercise
+
+
+```{r}
+library(tidyverse)
+```
+
+### 6.4.1 One-Sample Comparison: Ozone Concentration
+
+The question is whether the mean recorded daily ozone concentration differs from 30 ppb.
+
+#### 1a. Load and inspect the data
+
+```{r}
+data("airquality")
+head(airquality)
+str(airquality)
+```
+
+The dataset contains 153 daily observations and six variables. Ozone concentration is numerical, and some of its values are missing.
+
+#### 1b. Check the summary statistics
+
+```{r}
+summary(airquality$Ozone)
+```
+
+The recorded ozone concentrations range from 1 to 168 ppb. The median is 31.5 ppb, the mean is about 42.13 ppb, and the variable contains missing values.
+
+#### 1c. Identify available and missing measurements
+
+```{r}
+sum(is.na(airquality$Ozone))
+sum(!is.na(airquality$Ozone))
+```
+
+There are 37 missing ozone measurements and 116 recorded measurements.
+
+#### 1d–1e. Keep recorded measurements and count the observations
+
+```{r}
+ozone_data <- airquality[!is.na(airquality$Ozone), ]
+
+table(is.na(ozone_data$Ozone))
+summary(ozone_data$Ozone)
+```
+
+I kept the 116 rows with a recorded ozone concentration. No missing ozone values remain in the filtered data.
+
+#### 2. Explore the distribution
+
+```{r}
+library(tidyverse)
+
+ggplot(ozone_data, aes(x = Ozone)) +
+  geom_histogram(bins = 10, color = "white") +
+  labs(
+    title = "Daily Ozone Concentrations",
+    x = "Ozone concentration (ppb)",
+    y = "Number of days"
+  ) +
+  theme_minimal()
+
+ggplot(ozone_data, aes(x = "", y = Ozone)) +
+  geom_boxplot() +
+  labs(
+    title = "Ozone Concentrations",
+    x = NULL,
+    y = "Ozone concentration (ppb)"
+  ) +
+  theme_minimal()
+```
+
+The histogram is strongly right-skewed. The boxplot shows several high observations, including possible outliers.
+
+#### 3. State the hypotheses
+
+The null hypothesis is that the population mean daily ozone concentration is 30 ppb. The alternative hypothesis is that the population mean differs from 30 ppb. I use a two-sided test with α = 0.05.
+
+#### 4. Assess assumptions and choose a test
+
+```{r}
+library(tidyverse)
+
+ggplot(ozone_data, aes(sample = Ozone)) +
+  stat_qq() +
+  stat_qq_line() +
+  labs(
+    title = "Normal Q-Q Plot of Ozone Concentrations",
+    x = "Theoretical quantiles",
+    y = "Ozone concentration (ppb)"
+  ) +
+  theme_minimal()
+
+shapiro.test(ozone_data$Ozone)
+```
+
+The histogram and Q-Q plot show a strong departure from normality, and the Shapiro–Wilk test gives a p-value below 0.05. Following the decision rule in the manual, the one-sample Wilcoxon signed-rank test is the rank-based choice. It tests a location shift, not the arithmetic mean. Because the research question specifically asks about the mean, I also report the one-sample t-test and interpret it with caution due to the skew and high observations.
+
+#### 5. Conduct and report the analysis
+
+```{r}
+wilcox.test(ozone_data$Ozone, mu = 30, alternative = "two.sided")
+t.test(ozone_data$Ozone, mu = 30, alternative = "two.sided")
+```
+
+The Wilcoxon test indicates that the location of the recorded ozone measurements differs from 30 ppb. The one-sample t-test reports the sample mean, test statistic, p-value, and confidence interval for the population mean.
+
+#### 6. Interpret the findings
+
+The sample mean was about 42.13 ppb, which is higher than the reference value of 30 ppb. The one-sample t-test found a statistically significant difference, *t*(115) = 3.96, *p* < 0.001, with a 95% confidence interval of approximately 36.06 to 48.20 ppb. The Wilcoxon signed-rank test also found evidence of a difference in location (*p* < 0.05). These results indicate that recorded ozone concentrations were higher than 30 ppb in this dataset. The skewed distribution and possible time dependence should be considered when interpreting the result.
+
+### 6.4.2 Paired Comparison: Chick Weights at Day 10 and Day 21
+
+The question is whether mean chick body weight differs between Day 10 and Day 21 among chicks measured at both times.
+
+#### 1. Load and inspect the data
+
+```{r}
+data("ChickWeight")
+head(ChickWeight)
+str(ChickWeight)
+summary(ChickWeight)
+```
+
+The data contain repeated body-weight measurements for chicks assigned to different diets. This comparison uses only the Day 10 and Day 21 measurements.
+
+#### 2a–2e. Prepare and inspect complete pairs
+
+```{r}
+library(tidyverse)
+
+chick_wide <- ChickWeight |>
+  filter(Time %in% c(10, 21)) |>
+  pivot_wider(
+    names_from = Time,
+    values_from = weight,
+    names_prefix = "day"
+  )
+
+chick_complete <- chick_wide |>
+  filter(!is.na(day10), !is.na(day21)) |>
+  mutate(difference = day21 - day10)
+
+head(chick_wide)
+head(chick_complete)
+chick_wide |> summarise(total_chicks = n())
+chick_complete |> summarise(
+  complete_pairs = n(),
+  mean_difference = mean(difference),
+  sd_difference = sd(difference)
+)
+```
+
+I matched measurements by chick and kept only chicks with weights at both time points. There are 45 complete pairs. I calculated each difference as Day 21 weight minus Day 10 weight, so a positive difference means the chick weighed more on Day 21.
+
+#### 3. Explore the paired differences
+
+```{r}
+library(tidyverse)
+
+ggplot(chick_complete, aes(x = difference)) +
+  geom_histogram(bins = 10, color = "white") +
+  labs(
+    title = "Differences in Chick Weight",
+    x = "Day 21 weight minus Day 10 weight (g)",
+    y = "Number of chicks"
+  ) +
+  theme_minimal()
+```
+
+The differences show the direction and spread of weight changes for the same chicks. Most differences are positive, so most chicks weighed more on Day 21.
+
+#### 4. State the hypotheses
+
+Let the paired difference be Day 21 weight minus Day 10 weight. The null hypothesis is that the population mean difference is 0 g. The alternative hypothesis is that the population mean difference is not 0 g. I use α = 0.05.
+
+#### 5. Assess assumptions and choose a test
+
+```{r}
+library(tidyverse)
+
+ggplot(chick_complete, aes(sample = difference)) +
+  stat_qq() +
+  stat_qq_line() +
+  labs(
+    title = "Normal Q-Q Plot of Paired Differences",
+    x = "Theoretical quantiles",
+    y = "Weight difference (g)"
+  ) +
+  theme_minimal()
+
+shapiro.test(chick_complete$difference)
+```
+
+The normality assumption applies to the paired differences. I use the Q-Q plot and Shapiro–Wilk result together: if the p-value is below 0.05 and the plot shows a departure from the reference line, the Wilcoxon signed-rank test is preferred under the manual’s rule. Otherwise, the paired t-test is appropriate. The paired t-test directly tests the mean difference; the Wilcoxon test is rank-based.
+
+#### 6. Conduct the tests
+
+```{r}
+t.test(chick_complete$day21, chick_complete$day10, paired = TRUE)
+wilcox.test(chick_complete$day21, chick_complete$day10, paired = TRUE)
+```
+
+Both outputs are shown. I use the normality assessment above to identify the preferred test. The paired t-test directly addresses the question about the mean difference, while the Wilcoxon signed-rank test provides the rank-based alternative described in the manual.
+
+#### 7. Interpret and report the findings
+
+Among the 45 chicks with complete measurements, body weight increased from Day 10 to Day 21. The paired t-test output gives the estimated mean difference, test statistic, p-value, and confidence interval for that mean change. The Wilcoxon output gives the rank-based result. The normality assessment determines which test is preferred under the manual’s decision rule. Overall, the results show that the chicks in this sample were heavier on Day 21; the Wilcoxon result should be interpreted as a difference in location rather than as a direct test of the mean.
+
+### 6.4.3 Independent-Group Comparison: PlantGrowth
+
+The question is whether mean plant dry weight differs between the control group and treatment 1.
+
+#### 1. Load and inspect the data
+
+```{r}
+data("PlantGrowth")
+head(PlantGrowth)
+str(PlantGrowth)
+summary(PlantGrowth)
+```
+
+The dataset contains dry weights for plants in a control group and two treatment groups. This exercise compares the control group and treatment 1.
+
+#### 2. Select the two groups
+
+```{r}
+library(tidyverse)
+
+plant_two <- PlantGrowth |>
+  filter(group %in% c("ctrl", "trt1")) |>
+  droplevels()
+
+table(plant_two$group)
+```
+
+The selected data contain 10 plants in each group. Each plant is in only one group, so the groups are independent.
+
+#### 3. State the hypotheses
+
+The null hypothesis is that the population mean plant weights are equal in the control and treatment 1 groups. The alternative hypothesis is that the population means differ. I use a two-sided test with α = 0.05.
+
+#### 4. Explore the data
+
+```{r}
+library(tidyverse)
+
+ggplot(plant_two, aes(x = group, y = weight)) +
+  geom_boxplot() +
+  labs(
+    title = "Plant Dry Weight by Group",
+    x = "Group",
+    y = "Plant dry weight (g)"
+  ) +
+  theme_minimal()
+
+plant_two |>
+  group_by(group) |>
+  summarise(
+    n = n(),
+    mean_weight = mean(weight),
+    sd_weight = sd(weight)
+  )
+```
+
+The control group had a mean weight of 5.032 g, while treatment 1 had a mean weight of 4.661 g. The boxplot and standard deviations help compare the spread and identify unusual observations.
+
+#### 5. Assess assumptions and choose a test
+
+```{r}
+library(tidyverse)
+
+ggplot(plant_two, aes(sample = weight)) +
+  stat_qq() +
+  stat_qq_line() +
+  facet_wrap(~group) +
+  labs(
+    title = "Normal Q-Q Plots of Plant Weight by Group",
+    x = "Theoretical quantiles",
+    y = "Plant dry weight (g)"
+  ) +
+  theme_minimal()
+
+shapiro.test(plant_two$weight[plant_two$group == "ctrl"])
+shapiro.test(plant_two$weight[plant_two$group == "trt1"])
+```
+
+The observations are independent and plant weight is numerical. The Q-Q plots and Shapiro–Wilk tests do not show strong evidence against normality in either group. Welch’s two-sample t-test is appropriate for comparing the means and does not require equal population variances, so I do not need a separate equal-variance test to use it.
+
+#### 6. Conduct the test
+
+```{r}
+t.test(weight ~ group, data = plant_two)
+```
+
+The output reports Welch’s test statistic, degrees of freedom, p-value, estimated group means, and confidence interval for the difference.
+
+#### 7. Interpret and report the findings
+
+Mean plant dry weight was 5.032 g in the control group and 4.661 g in treatment 1, an estimated difference of 0.371 g (control minus treatment 1). Welch’s two-sample t-test did not show a statistically significant difference between the group means, *t*(16.52) = 1.19, *p* = 0.250. The 95% confidence interval for the mean difference was approximately −0.288 to 1.030 g and includes zero. I fail to reject the null hypothesis because the data do not provide sufficient evidence that the population mean plant dry weights differ between the control and treatment 1 groups.
