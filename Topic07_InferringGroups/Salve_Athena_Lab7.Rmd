@@ -1,0 +1,319 @@
+---
+title: "Salve_Athena_Lab7"
+author: "Athena Salve"
+date: "2026-11-21"
+output: html_document
+---
+
+# Correlation and Simple Linear Regression
+
+### Student Information
+
+Name: Athena Nicole R. Salve
+
+Section: B2
+
+Date: November 21, 2026
+
+GitHub Repository URL: <https://github.com/arsalve28/BIO118>
+
+# Lab Exercise 6B
+
+## Introduction
+
+This exercise uses scatterplots, correlation, and simple linear regression in R to examine relationships between quantitative variables. Pearson and Spearman correlations describe the direction and strength of an association. Simple linear regression estimates how the response changes with the predictor, while residual plots help assess how well the model fits the data and how reliable its predictions are.
+
+## 7.1 Correlation Analysis
+
+#### 7.1.1 Load and Inspect the Data
+
+```{r}
+library(abd)
+library(ggplot2)
+
+data("Crickets")
+head(Crickets)
+str(Crickets)
+```
+
+#### 7.1.2 Explore the data
+
+```{r}
+library(ggplot2)
+ggplot(Crickets, aes(x = sperm.viability, y = lysozyme)) +
+  geom_point() +
+  labs(
+    title = "Sperm Viability and Lysozyme Levels in Crickets",
+    x = "Sperm Viability",
+    y = "Lysozyme Levels"
+  ) +
+  theme_minimal()
+```
+
+**1. Describe the relationship between sperm viability and lysozyme levels in terms of its direction, form, and strength. Are there any unusual observations?**
+
+Based on the scatterplot, crickets with higher sperm viability generally had lower lysozyme levels. The points show a roughly linear downward trend, but they are fairly spread out, suggesting a weak to moderate negative relationship. Two observations stand out. One cricket had a sperm viability of 72.6, lower than the rest, while another had a relatively high lysozyme level of 20.5 at a sperm viability of 80.
+
+#### 7.1.3 Perform correlation analysis
+
+```{r}
+# Perform Pearson Correlation
+cor_pearson <- cor.test(
+  Crickets$sperm.viability,
+  Crickets$lysozyme,
+  method = "pearson"
+)
+cor_pearson
+
+# Perform Spearman Correlation
+cor_spearman <- cor.test(
+  Crickets$sperm.viability,
+  Crickets$lysozyme,
+  method = "spearman",
+  exact = FALSE
+)
+cor_spearman
+```
+
+**2. Compare the Pearson and Spearman correlation results. What are their respective correlation coefficients and p-values? Do they lead to the same conclusion about the relationship between sperm viability and lysozyme levels? Explain.**
+
+Pearson’s correlation gave r = −0.3444 and p = 0.02748, while Spearman’s correlation gave ρ = −0.3046 and p = 0.05285. Both coefficients show a similar negative relationship, meaning that lysozyme levels tended to decrease as sperm viability increased. However, only Pearson’s result was statistically significant at the 0.05 level. Spearman’s p-value was slightly above 0.05, so the two tests agree on the direction of the relationship but differ in whether it reaches significance.
+
+**3. What does correlation tell us about the relationship between two variables? Does a statistically significant correlation establish that one variable causes a change in the other? Explain.**
+
+Correlation tells us how strongly two variables are related and whether they tend to change in the same or opposite directions. A significant correlation alone cannot establish causation. In the cricket example, we can say that higher sperm viability was associated with lower lysozyme levels, but we cannot conclude that an increase in sperm viability caused lysozyme levels to decrease.
+
+## 7.2 Simple Linear Regression
+
+### 7.2.1 Load and inspect the data
+
+```{r}
+data("Rattlesnakes")
+
+head(Rattlesnakes)
+str(Rattlesnakes)
+colSums(is.na(Rattlesnakes))
+```
+
+### 7.2.2 Explore the data
+
+```{r}
+ggplot(Rattlesnakes, aes(x = meal.size, y = temp.change)) +
+  geom_point() +
+  labs(
+  title = "Meal Size and Postprandial Temperature Change",
+  x = "Meal Size",
+  y = "Postprandial Temperature Change"
+  ) +
+  theme_minimal()  
+```
+
+**4. Identify the predictor and response variables. Describe the relationship between meal size and postprandial temperature change based on the scatterplot. Does a straight-line model appear appropriate? Explain.**
+
+Meal size is the predictor variable, while the change in body temperature after feeding is the response variable. The scatterplot shows that snakes that ate larger meals generally had a greater increase in body temperature. A straight-line model appears reasonable because the points follow a clear upward trend.
+
+### 7.2.3 Fit a simple linear regression model
+
+```{r}
+model <- lm(temp.change ~ meal.size, data = Rattlesnakes)
+
+Rattlesnakes$fitted <- fitted(model)
+Rattlesnakes$residuals <- residuals(model)
+
+model
+```
+
+**5. Write the fitted regression equation. Interpret the intercept and slope in the context of the rattlesnake investigation. Is the intercept biologically meaningful? Explain.**
+
+**Predicted temperature change = 0.31956 + 0.02738 × meal size**
+
+The intercept means that when meal size is zero, the predicted average temperature increase is 0.32°C. This is biologically meaningful because the study included unfed snakes, so we have a baseline for comparison. The slope means that if meal size increases from, for example, 10% to 11% of the snake’s body mass, the predicted temperature increase is about 0.027°C greater.
+
+### 7.2.4 Examine the regression results
+
+```{r}
+summary(model)
+```
+
+**6. What is the p-value associated with the slope? State the null and alternative hypotheses. At a significance level of 0.05, what is your decision, and what does the result indicate about the relationship between meal size and postprandial temperature change?**
+
+**H₀:** The slope equals zero. Meal size has no linear relationship with mean temperature change.\
+**H₁:** The slope differs from zero. Meal size has a linear relationship with mean temperature change.
+
+The p-value for the slope was 9.38 × 10⁻⁷. Since this is below 0.05, I reject the null hypothesis. The positive slope indicates that rattlesnakes that ate larger meals generally showed a greater increase in body temperature.
+
+**7. What are the R-squared and adjusted R-squared values? Interpret the R-squared value in the context of the investigation.**
+
+The R² was 0.8080, and the adjusted R² was 0.7952. This means that differences in meal size accounted for about 80.8% of the observed variation in temperature change among the rattlesnakes.
+
+### 7.2.5 Visualize the fitted regression line
+
+```{r}
+ggplot(Rattlesnakes, aes(x = meal.size, y = temp.change)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Simple Linear Regression of Meal Size and Temperature Change",
+    x = "Meal Size",
+    y = "Postprandial Temperature Change"
+  ) +
+  theme_minimal()
+```
+
+**8. What does the shaded area around the regression line represent? Why might some observed points fall outside this region?**
+
+The shaded area represents the 95% confidence interval for the mean temperature change at each meal size. Even when two snakes eat the same relative meal size, one may warm up more than the other. This individual variation explains why some points fall outside the shaded area.
+
+### 7.2.6 Examine model residuals
+
+```{r}
+head(Rattlesnakes)
+
+ggplot(Rattlesnakes, aes(x = fitted, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Residuals versus Fitted Values",
+    x = "Fitted Values",
+    y = "Residuals"
+  ) +
+  theme_minimal()
+
+plot(model, which = 2)
+```
+
+**9. Examine the residual-versus-fitted and Q-Q plots. Do the residuals show any recognizable patterns or departures from the reference line? What do these observations suggest about the suitability of the linear regression model?**
+
+In the residual plot, the points are below zero at the lowest fitted values, while several are above zero near the middle. The clearest difference is at the largest meal size, where the snake’s temperature increase was about 0.40°C lower than predicted. This suggests some curvature in the relationship. In the Q-Q plot, most points follow the reference line fairly closely, although the lowest point falls below it. Overall, a straight line describes the general trend reasonably well, but it overestimates the response at the largest meal size.
+
+### 7.2.7 Predict using the regression model
+
+```{r}
+range(Rattlesnakes$meal.size)
+
+predict(model,
+        newdata = data.frame(meal.size = 10),
+        interval = "confidence")
+
+predict(model,
+        newdata = data.frame(meal.size = 10),
+        interval = "prediction")
+```
+
+**10. What is the predicted postprandial temperature change for the selected meal size? Explain the difference between the confidence interval for the mean response and the prediction interval for an individual observation. Which is more appropriate for predicting the temperature change of an individual rattlesnake?**
+
+For a meal equal to 10% of body mass, the predicted temperature increase is 0.593°C. The 95% confidence interval of 0.457 to 0.729°C estimates the average increase among snakes eating a meal of this size. If we want to predict the temperature change of one rattlesnake, the 95% prediction interval of 0.163 to 1.023°C is more appropriate. It is wider because individual snakes can respond differently to the same meal size.
+
+## 7.3 Practice Exercise: Temperature and Ozone Concentration
+
+### 7.3.1 Load and prepare the data
+
+```{r}
+data("airquality")
+
+ozone_data <- airquality[, c("Temp", "Ozone")]
+colSums(is.na(ozone_data))
+
+ozone_data <- na.omit(ozone_data)
+
+head(ozone_data)
+str(ozone_data)
+```
+
+**1. Which variables were selected, and how many observations remained after removing missing values?**
+
+I selected daily temperature (`Temp`) and ozone concentration (`Ozone`). Temperature was recorded for all 153 days, but 37 days were missing an ozone measurement. After removing those rows, 116 days had both measurements and were included in the analysis.
+
+### 7.3.2 Explore the relationship
+
+```{r}
+ggplot(ozone_data, aes(x = Temp, y = Ozone)) +
+  geom_point() +
+  labs(
+    title = "Temperature and Ozone Concentration",
+    x = "Temperature (°F)",
+    y = "Ozone concentration (ppb)"
+  ) +
+  theme_minimal()
+```
+
+**2. Using the scatterplot, describe the direction, form, and strength of the relationship.**
+
+The scatterplot shows a moderately strong positive relationship. Ozone levels were generally low on cooler days and tended to increase as the temperature rose. The trend curves slightly upward, and the points are more spread out on warmer days. One observation that stands out is 168 ppb at 81°F, which is much higher than the other ozone readings at around the same temperature.
+
+### 7.3.3 Perform correlation analysis
+
+```{r}
+cor.test(
+  ozone_data$Temp,
+  ozone_data$Ozone,
+  method = "pearson"
+)
+```
+
+**3. What do the Pearson correlation coefficient and p-value indicate about the relationship between temperature and ozone concentration?**
+
+Pearson’s correlation gave r = 0.6984, showing a moderately strong positive relationship between temperature and ozone concentration. The p-value was below 0.001, so the relationship was statistically significant. This supports what we see in the scatterplot, where warmer days generally had higher ozone levels.
+
+### 7.3.4 Fit a simple linear regression model
+
+```{r}
+ozone_model <- lm(Ozone ~ Temp, data = ozone_data)
+
+summary(ozone_model)
+
+ggplot(ozone_data, aes(x = Temp, y = Ozone)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Simple Linear Regression of Temperature and Ozone Concentration",
+    x = "Temperature (°F)",
+    y = "Ozone concentration (ppb)"
+  ) +
+  theme_minimal()
+```
+
+**4. What is the fitted regression equation? Interpret the slope, p-value, and R-squared value.**
+
+Predicted ozone concentration = −146.9955 + 2.4287 × temperature
+
+The slope means that for every 1°F increase in temperature, the predicted ozone concentration increases by about 2.43 ppb on average. The slope was statistically significant (p \< 0.001). The R² was 0.4877, meaning that temperature accounted for about 48.8% of the observed variation in daily ozone levels.
+
+### 7.3.5 Examine model residuals
+
+```{r}
+ozone_data$fitted <- fitted(ozone_model)
+ozone_data$residuals <- residuals(ozone_model)
+
+ggplot(ozone_data, aes(x = fitted, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Residuals versus Fitted Values",
+    x = "Fitted Values",
+    y = "Residuals"
+  ) +
+  theme_minimal()
+
+plot(ozone_model, which = 2)
+```
+
+**5. Based on the residual-versus-fitted plot and normal Q-Q plot, identify any potential departures from the assumptions of linear regression. What do these observations suggest about the suitability of the fitted model?**
+
+In the residual plot, the points tend to be above zero at the lowest fitted values and become more spread out as predicted ozone levels increase. This suggests some curvature and uneven variation around the regression line. In the Q-Q plot, the largest residuals fall above the reference line, showing that some days had much higher ozone levels than the model predicted. The model describes the overall increase in ozone with temperature, but it gives a less precise estimate for an individual day.
+
+### 7.3.6 Make a prediction
+
+```{r}
+predict(ozone_model,
+        newdata = data.frame(Temp = 80),
+        interval = "prediction")
+```
+
+**6. What is the predicted ozone concentration at 80°F? Interpret the prediction interval for an individual observation.**
+
+At 80°F, the predicted ozone concentration is 47.30 ppb. For a single day at this temperature, the model gives a 95% prediction interval of 0.11 to 94.49 ppb. This wide range shows that days with the same temperature can still have very different ozone levels, so 47.30 ppb is a rough estimate for any one day.
+
+## Conclusion
+
+In this exercise, I used correlation and simple linear regression to examine relationships between variables. In crickets, higher sperm viability tended to occur with lower lysozyme levels, although only Pearson’s test showed a statistically significant relationship. In rattlesnakes, meal size accounted for 80.8% of the variation in temperature change, with larger meals generally followed by greater increases in body temperature. Warmer days also tended to have higher ozone levels, but the wide prediction interval at 80°F showed how much ozone could vary on an individual day. These results helped me understand why a statistically significant relationship can describe an overall trend even when individual predictions are uncertain.
