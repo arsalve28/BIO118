@@ -1,0 +1,378 @@
+---
+title: "BIO 118 Laboratory Exercise 8"
+author: "Marianne Llauderes, Ashley Engwa, Athena Salve, Karyll Nadala"
+date: "2026-11-28"
+output: html_document
+---
+
+## 8.1 Define the System
+
+```{r}
+# Load the dataset
+fish <- read.csv("8B_coastal_fish_population.csv")
+
+# Check the variable names
+names(fish)
+
+# Check the sites and their protection status
+table(fish$site, fish$protection_status)
+
+# Check the number of transects per site in each season
+table(fish$site, fish$season)
+
+# Check the habitat types that were surveyed
+table(fish$habitat_type)
+```
+
+**What is the name of the system?**
+
+Nearshore Coastal Fish Population System
+
+**What is included in the system, and what is outside it?**
+
+The system includes the fish population living in the six surveyed nearshore sites, together with its prey and its predators. The processes that change the population size, such as recruitment, mortality, immigration, and emigration, are also part of the system.
+
+Outside the system are the external factors that affect the fish population but are not part of it, such as the monsoon seasons, the local water conditions like temperature, dissolved oxygen, and salinity, the habitat the fish depend on may it be seagrass, coral reef, mangrove, or mixed habitat, the protection status of the sites, and the fishermen and their boats, whose activity affects the system through fishing pressure. The offshore spawning grounds, the larger fish population in the surrounding region, and the market demand for fish are also outside the system.
+
+**What is the focal component or response?**
+
+The focal component is the abundance of the coastal fish population. Abundance is not measured directly in the dataset, so it is observed indirectly through the fish observations: CPUE and fish catch count from standardized net sampling, and fish presence from visual transects.
+
+**What level of biological organization does the system represent?**
+
+The system represents the population level, since it focuses on a group of fish living and interacting in the same area.
+
+At the smaller organism level, the population size depends on whether individual fish survive, grow, and reproduce. The physiology of each fish, such as its oxygen requirement, thermal tolerance, and ability to osmoregulate, determines whether it can survive the local conditions.
+
+At the larger community and ecosystem level, the population interacts with other species. It feeds on prey, is eaten by predators, competes with other fishes, and depends on habitats formed by other organisms such as seagrasses, corals, and mangroves. Changes in the fish population can in turn affect its prey and predators.
+
+**Deliverable: One-sentence system description**
+
+The Nearshore Coastal Fish Population System is a population-level system in which the abundance of fish at six nearshore sites is shaped by external drivers such as season, water conditions, habitat, and fishing pressure, and by interactions with prey and predators, and is observed through CPUE, fish presence, and fish catch count.
+
+## 8.2 Identify system components and variables
+
+```{r}
+# Create the component-variable table
+component_table <- data.frame(
+  Component = c(
+    "Fish population",
+    "Fish observations",
+    "Environment",
+    "Habitat",
+    "Food resources",
+    "Biological interactions",
+    "Human pressures",
+    "Management",
+    "Time / climate",
+    "Population processes",
+    "Sampling process"
+  ),
+  
+  Role = c(
+    "Focal biological component",
+    "Measurable outputs of the fish population",
+    "External drivers / inputs",
+    "External driver affecting survival and recruitment",
+    "Internal component affecting growth and survival",
+    "Internal interactions affecting mortality",
+    "External driver / input",
+    "Management factor influencing fishing pressure",
+    "Seasonal influence on environmental conditions",
+    "Internal biological processes",
+    "Influences fish observations and catch measurements"
+  ),
+  
+  Variables = c(
+    "Not directly measured; represented by fish observations",
+    "CPUE_fish_per_net_hour, fish_presence, fish_catch_count",
+    "temperature_C, dissolved_oxygen_mg_L, salinity_ppt",
+    "habitat_cover_pct, habitat_type",
+    "prey_density_index",
+    "predator_index",
+    "fishing_pressure_boats_day",
+    "protection_status",
+    "season",
+    "Not directly measured: recruitment, natural mortality, immigration, emigration",
+    "sampling_effort_net_hours"
+  ),
+  
+  Measured_or_Proposed = c(
+    "Focal component; indirectly represented",
+    "Directly measured",
+    "Directly measured",
+    "Directly measured",
+    "Directly measured (index)",
+    "Directly measured (index)",
+    "Directly measured",
+    "Recorded (categorical)",
+    "Recorded (categorical)",
+    "Proposed biological processes",
+    "Directly measured; catchability and gear efficiency are proposed"
+  )
+)
+
+# Display the component-variable table
+knitr::kable(
+  component_table,
+  col.names = c(
+    "System Component",
+    "Role in the System",
+    "Variables in the Dataset",
+    "Measured or Proposed?"
+  ),
+  caption = "Major components and variables of the coastal fish population system"
+)
+```
+
+The dataset contains direct measurements of temperature, dissolved oxygen, salinity, habitat cover, prey density, predator abundance, fishing pressure, sampling effort, fish catch count, CPUE, and fish presence. On the other hand, the actual fish abundance, recruitment rate, natural and fishing mortality rates, immigration and emigration, growth and survival, and catchability cannot be observed from a single transect survey. These would require other methods such as tagging, mark-recapture, juvenile surveys, or repeated surveys of the same population over time. In this exercise, these processes are included only as proposed mechanisms in the systems diagram, while the statistical analyses use only the measured variables.
+
+CPUE and fish presence should not be treated as the same measurement. CPUE is a continuous rate based on net sampling, while fish presence is a binary result from a separate visual survey. Each method also has its own biases, such as catchability and gear type for CPUE, and water visibility and observer detection for fish presence.
+
+## 8.3 Construct a systems diagram
+
+The diagram is divided into three parts. The External Drivers at the top are the factors that act on the fish population from outside the system: seasonal variation, environmental conditions (temperature, dissolved oxygen, and salinity), habitat conditions (habitat type and habitat cover), and human activities (fishing pressure). The Internal Biological Components and Processes in the middle include food availability, predator abundance, and the processes that directly change the population size, which are recruitment, growth and survival, and mortality. These all lead to the Coastal Fish Population, which is the focal biological component. The Measurable Outputs at the bottom are the fish observations recorded in the dataset: CPUE, fish presence, and fish catch count. The solid arrows show the direction of influence between the components, and the label on each arrow explains the relationship.
+
+Some parts of the diagram are directly measured, while others are proposed biological mechanisms. The directly measured variables are the ones found in the dataset, namely habitat type and habitat cover, temperature, dissolved oxygen, salinity, fishing pressure, prey density, predator index, and the measurable outputs (CPUE, fish presence, and fish catch count), while season is also recorded in the dataset. On the other hand, recruitment, growth and survival, mortality, predation, and fishing related mortality are proposed biological mechanisms. These processes are not measured directly in the dataset, but they explain how the external drivers and internal components affect the fish population. To distinguish them from the measured variables, the proposed processes are shown in purple.
+
+The dotted arrow in the diagram represents a predator-prey feedback pathway. When the coastal fish population increases, there is more food available for predators, so predator abundance may increase. More predators then lead to more predation, which increases mortality and reduces the fish population. As the fish population decreases, there is less food for predators, so predator abundance may decrease again. This is a negative feedback loop because it prevents the fish population from increasing or decreasing without limit and helps keep it within the level that the system can support.
+
+![](925167423_2351662302352346_1798632081761288797_n.png)
+
+**Figure 1.** Systems diagram of the Nearshore Coastal Fish Population System. Light blue boxes are variables measured in the dataset, purple boxes are proposed biological processes, and the dotted arrow shows the predator-prey feedback pathway.
+
+## 8.4 Formulate biological research questions
+
+| \# | Type of question | Research question | Variable | Role | Measurement type |
+|------------|------------|------------|------------|------------|------------|
+| RQ1 | Group differences (2 groups) | Does fish CPUE differ between protected and unprotected sites? | `CPUE_fish_per_net_hour` | Response | Continuous (ratio, fish per net-hour) |
+|  |  |  | `protection_status` | Explanatory | Categorical, nominal (2 levels) |
+| RQ2 | Continuous relationship | Is dissolved oxygen associated with fish CPUE? | `dissolved_oxygen_mg_L` | Explanatory | Continuous (ratio, mg/L) |
+|  |  |  | `CPUE_fish_per_net_hour` | Response | Continuous (ratio, fish per net-hour) |
+| RQ3 | Group differences (3 or more groups) | Does fish CPUE differ among the three monsoon seasons? | `season` | Explanatory | Categorical, nominal (3 levels) |
+|  |  |  | `CPUE_fish_per_net_hour` | Response | Continuous (ratio, fish per net-hour) |
+
+## 8.5 Select appropriate statistical methods
+
+1.  **Does fish CPUE differ between protected and unprotected sites?**
+
+    a\. Statistical method - Welch’s two-sample *t*-test
+
+    b\. Explanation - Fish CPUE is continuous, and protection status has two groups. The test will compare mean CPUE between protected and unprotected sites. Each site will contribute one mean because protection status is recorded at the site level.
+
+    c\. Assumption or limitation - The test assumes that sites are independent. With only six sites, the comparison has limited power, and an extreme site mean can influence the result.
+
+2.  **Is dissolved oxygen associated with fish CPUE?**
+
+    a\. Statistical method - Pearson correlation
+
+    b\. Explanation - Dissolved oxygen and fish CPUE are both continuous. Pearson correlation will measure the strength and direction of their linear relationship across transects.
+
+    c\. Assumption or limitation - The scatterplot should show an approximately linear relationship without strong outliers. Transects from the same site may be similar, hence the usual correlation *p-*value should be interpreted with caution.
+
+3.  **Does fish CPUE differ among the three monsoon seasons?**
+
+    a\. Statistical method - Two-way ANOVA with site as a block.
+
+    b\. Explanation - Fish CPUE is continuous, and season has three groups. Since the same sites were surveyed across seasons, the analysis will compare seasonal mean CPUE while accounting for differences among sites.
+
+    c\. Assumption or limitation - The model assumes that seasonal differences are consistent across sites and that the residuals have similar variance and are approximately normal.
+
+## 8.6 Data preparation
+
+#### Import the dataset
+
+```{r}
+fish <- read.csv(
+  "8B_coastal_fish_population.csv",
+  na.strings = c("", "NA", "N/A"),
+  strip.white = TRUE
+)
+
+dim(fish)
+head(fish)
+```
+
+#### Inspect the structure and variable types
+
+```{r}
+fish$site <- factor(fish$site)
+fish$protection_status <- factor(fish$protection_status)
+fish$season <- factor(fish$season)
+
+str(fish)
+
+with(fish, table(site, protection_status, useNA = "ifany"))
+with(fish, table(site, season, useNA = "ifany"))
+```
+
+#### Check the number and distribution of missing values
+
+```{r}
+missing_count <- colSums(is.na(fish))
+
+missing_summary <- data.frame(
+  Variable = names(fish),
+  Missing = as.integer(missing_count),
+  Percent_missing = round(100 * as.integer(missing_count) / nrow(fish), 1)
+)
+
+knitr::kable(missing_summary)
+
+# Count rows with at least one missing value by site and season
+incomplete <- !complete.cases(fish)
+with(fish[incomplete, ], table(site, season, useNA = "ifany"))
+```
+
+#### Select the variables and handle missing observations
+
+```{r}
+rq1 <- na.omit(fish[c("site", "protection_status", "CPUE_fish_per_net_hour")])
+
+rq2 <- na.omit(fish[c("site", "dissolved_oxygen_mg_L", "CPUE_fish_per_net_hour")])
+
+rq3 <- na.omit(fish[c("site", "season", "CPUE_fish_per_net_hour")])
+
+regression_data <- na.omit(fish[c(
+  "CPUE_fish_per_net_hour",
+  "dissolved_oxygen_mg_L",
+  "habitat_cover_pct",
+  "prey_density_index"
+)])
+
+retained <- c(nrow(rq1), nrow(rq2), nrow(rq3), nrow(regression_data))
+
+knitr::kable(data.frame(
+  Analysis = c("RQ1: Protection", "RQ2: Dissolved oxygen",
+               "RQ3: Season", "Multiple regression"),
+  Rows_retained = retained,
+  Rows_excluded = nrow(fish) - retained
+))
+```
+
+#### Prepare the site means for the group comparisons
+
+```{r}
+site_cpue <- aggregate(
+  CPUE_fish_per_net_hour ~ site + protection_status,
+  data = rq1,
+  FUN = mean
+)
+
+season_cpue <- aggregate(
+  CPUE_fish_per_net_hour ~ site + season,
+  data = rq3,
+  FUN = mean
+)
+
+knitr::kable(site_cpue)
+knitr::kable(season_cpue)
+```
+
+#### Prepare the response variable for regression
+
+```{r}
+vapply(regression_data, is.numeric, logical(1))
+summary(regression_data$CPUE_fish_per_net_hour)
+sum(regression_data$CPUE_fish_per_net_hour == 0)
+```
+
+## 8.7 Perform the selected statistical analyses
+
+#### Analysis 1 (RQ1): Does fish CPUE differ between protected and unprotected sites?
+
+**Variables:** The response is `CPUE_fish_per_net_hour` (continuous, ratio) and the explanatory variable is `protection_status` (categorical, nominal, 2 levels). Protection status is assigned to a whole site, so we used one mean CPUE per site (`site_cpue` from 8.6) instead of treating every transect as an independent replicate.
+
+```{r}
+# Visualization: boxplot of transects with the site means overlaid
+boxplot(CPUE_fish_per_net_hour ~ protection_status, data = rq1,
+        col = c("lightblue", "lightsalmon"),
+        xlab = "Protection status", ylab = "CPUE (fish per net-hour)",
+        main = "CPUE by protection status", outline = FALSE)
+stripchart(CPUE_fish_per_net_hour ~ protection_status, data = rq1,
+           vertical = TRUE, method = "jitter", pch = 16, cex = 0.5,
+           col = rgb(0, 0, 0, 0.25), add = TRUE)
+stripchart(CPUE_fish_per_net_hour ~ protection_status, data = site_cpue,
+           vertical = TRUE, pch = 18, cex = 2, col = "black", add = TRUE)
+legend("topright", legend = c("Transect", "Site mean"),
+       pch = c(16, 18), pt.cex = c(0.7, 1.5), bty = "n")
+
+# Welch's two-sample t-test on the site means
+t.test(CPUE_fish_per_net_hour ~ protection_status, data = site_cpue)
+```
+
+**Interpretation:** CPUE was not significantly different between protected and unprotected sites (t = −0.40, p = 0.689). In other words, the difference between the two groups is small compared with how much the sites vary, so we cannot say that protection changes catch rate in these data.
+
+**What this can and cannot establish:** We only have six sites (three per group), so the test has little power. A non-significant result means that we did not detect a difference, not that protection has no effect. Protection status is also tied to the site itself, such as its habitat and fishing pressure, and CPUE is only an index of abundance, so this result cannot show whether protection changes the actual number or survival of fish.
+
+#### Analysis 2 (RQ2): Is dissolved oxygen associated with fish CPUE?
+
+**Variables:** `dissolved_oxygen_mg_L` (continuous, ratio, mg/L) is the explanatory variable and `CPUE_fish_per_net_hour` (continuous, ratio) is the response. Each transect is one observation.
+
+```{r}
+# Visualization: scatterplot with a linear fit, colored by site
+cols <- rainbow(nlevels(rq2$site), alpha = 0.6)
+plot(rq2$dissolved_oxygen_mg_L, rq2$CPUE_fish_per_net_hour,
+     pch = 16, col = cols[rq2$site],
+     xlab = "Dissolved oxygen (mg/L)", ylab = "CPUE (fish per net-hour)",
+     main = "CPUE vs dissolved oxygen")
+abline(lm(CPUE_fish_per_net_hour ~ dissolved_oxygen_mg_L, data = rq2),
+       lwd = 2, col = "black")
+legend("topleft", legend = levels(rq2$site), col = cols, pch = 16,
+       cex = 0.7, ncol = 2, bty = "n", title = "Site")
+
+# Pearson correlation
+cor.test(rq2$dissolved_oxygen_mg_L, rq2$CPUE_fish_per_net_hour,
+         method = "pearson")
+```
+
+**Interpretation:** Transects with higher dissolved oxygen tended to have higher CPUE (r = 0.385, p \< 0.001). The relationship is positive and moderate in strength. Squaring r gives about 15%, which is the share of the variation in CPUE that dissolved oxygen explains on its own, so other factors also matter.
+
+**What this can and cannot establish:** The correlation shows that the two variables go together, not that oxygen causes the change in catch. Oxygen may also vary with habitat cover, prey density, season, or site, and fish may simply move to better-oxygenated water, which changes the catch without changing the population size. Transects from the same site are not fully independent, so the p-value should be read with caution.
+
+## 8.8 Multiple linear regression: Considering multiple predictors
+
+```{r}
+# Fit the model: CPUE ~ dissolved oxygen + habitat cover + prey density
+mlr <- lm(CPUE_fish_per_net_hour ~ dissolved_oxygen_mg_L +
+            habitat_cover_pct + prey_density_index,
+          data = regression_data)
+summary(mlr)
+
+# 95% confidence intervals for the coefficients
+confint(mlr)
+
+# Check whether the predictors are too strongly correlated with each other (VIF)
+preds <- c("dissolved_oxygen_mg_L", "habitat_cover_pct", "prey_density_index")
+vif <- sapply(preds, function(p) {
+  f <- reformulate(setdiff(preds, p), response = p)
+  1 / (1 - summary(lm(f, data = regression_data))$r.squared)
+})
+round(vif, 2)
+```
+
+#### Check the residual assumptions
+
+```{r}
+par(mfrow = c(2, 2))
+plot(mlr)
+par(mfrow = c(1, 1))
+
+shapiro.test(residuals(mlr))
+```
+
+**Interpretation:**
+
+1.  **Overall model.** Yes, the three predictors together were significantly associated with CPUE (see the F-test at the bottom of the `summary(mlr)` output).
+
+2.  **Individual predictors.** With the other two predictors held constant, dissolved oxygen, habitat cover and prey density were each significantly and positively associated with CPUE. This means that higher oxygen, more habitat cover and more prey were each linked to higher catch rates.
+
+3.  **Variation explained.** The R² is about 0.47, so the three predictors together explain about 47% of the variation in CPUE. The rest comes from factors that are not in the model, such as season, site, fishing pressure, and sampling noise.
+
+4.  **Residual assumptions.** The residuals-vs-fitted plot should show no curve or funnel shape, and the points in the Q-Q plot should follow the line. The VIF values should be below about 5, which means that the predictors are not too strongly correlated with each other. If the plots show clear problems, a transformation such as log(CPUE + 1) could be tried.
+
+**Relation to the coastal fish population system:** This model relates to the **environment → growth and survival**, **habitat → recruitment**, and **prey → growth and survival** arrows in our systems diagram. These measured drivers are associated with CPUE, one of the measurable outputs of the system. However, the data are observational and survival, recruitment, and growth were not measured, so we cannot conclude that these drivers cause the differences in CPUE.
+
+## 8.9 Synthesize findings within the biological system
+
+Our analyses showed that, in this coastal fish population, catch rate (CPUE) was linked to the **local conditions inside the system** more than to protection status. CPUE was not significantly different between protected and unprotected sites (t = −0.40, p = 0.689), even though unprotected sites had more fishing boats. However, CPUE rose with dissolved oxygen (r = 0.385, p \< 0.001), and in the multiple regression, dissolved oxygen, habitat cover and prey density were all positive, significant predictors that together explained about 47% of the variation in CPUE. These results relate to the **environment → growth and survival**, **habitat → recruitment** and **prey → growth and survival** arrows in our systems diagram, and suggest that the human-pressure pathway (protection → fishing → mortality) was weaker or harder to detect in these data. This tells us that the size of the population at a site depends on several resources working together, so managing water quality and habitat may matter as much as limiting fishing. Possible mechanisms are that well-oxygenated water reduces stress and death; dense seagrass, coral or mangrove cover gives shelter from predators and nursery areas for young fish; and more prey supports faster growth and better survival. Fish may also simply **move toward** better sites, which would change where fish are caught without changing the total population. We cannot tell these apart with one-time CPUE data. To test these mechanisms we would need repeated surveys over several years at more sites, measures of recruitment (juvenile counts), growth (fish length and age) and mortality, tagging to track movement, standardized measures of catchability, and ideally a comparison before and after protection or a habitat restoration experiment.
